@@ -111,7 +111,12 @@ const MenuItemSchema = new Schema<IMenuItem>(
 );
 
 MenuItemSchema.index({ category: 1, sortOrder: 1, createdAt: 1 });
-MenuItemSchema.index({ isAvailable: 1, category: 1, sortOrder: 1, createdAt: 1 });
+MenuItemSchema.index({
+  isAvailable: 1,
+  category: 1,
+  sortOrder: 1,
+  createdAt: 1
+});
 MenuItemSchema.index({ images: 1 });
 
 const MenuItem = mongoose.model<IMenuItem>("MenuItem", MenuItemSchema);
