@@ -21,10 +21,10 @@ kochi-guru-pizza/
 └── docs/docker/README.md
 ```
 
-| Service | Container port | Host port | Notes |
-| --- | --- | --- | --- |
-| `frontend` | `3000` | `3000` | Next.js website |
-| `backend` | `5000` | `5000` | Express API, mounted at `/v1` |
+| Service    | Container port | Host port | Notes                         |
+| ---------- | -------------- | --------- | ----------------------------- |
+| `frontend` | `3000`         | `3000`    | Next.js website               |
+| `backend`  | `5000`         | `5000`    | Express API, mounted at `/v1` |
 
 Both Dockerfiles use **Node.js 24 Alpine** and build the TypeScript applications before starting them. Compose sets `INTERNAL_API_URL=http://backend:5000/v1` for the frontend, allowing server-side Next.js requests to reach the API by its service name.
 
@@ -116,10 +116,10 @@ docker compose logs -f frontend
 
 Once the services are running:
 
-| Service | URL |
-| --- | --- |
-| Website | http://localhost:3000 |
-| Backend | http://localhost:5000 |
+| Service              | URL                           |
+| -------------------- | ----------------------------- |
+| Website              | http://localhost:3000         |
+| Backend              | http://localhost:5000         |
 | Public menu endpoint | http://localhost:5000/v1/menu |
 
 The `frontend` service has `depends_on: backend`, which controls startup order but **does not guarantee that the backend or MongoDB connection is ready**. If the menu cannot load immediately, check the backend logs first.
@@ -128,23 +128,23 @@ The `frontend` service has `depends_on: backend`, which controls startup order b
 
 All commands here work in both Windows PowerShell and Linux Bash.
 
-| Command | Purpose |
-| --- | --- |
-| `docker compose up --build -d` | Build images and start services in the background |
-| `docker compose up -d` | Start services using existing images |
-| `docker compose ps` | Show container status and ports |
-| `docker compose logs -f` | Stream logs from both services |
-| `docker compose logs -f backend` | Stream API logs |
-| `docker compose logs -f frontend` | Stream website logs |
-| `docker compose build backend` | Rebuild the backend image |
-| `docker compose build frontend` | Rebuild the frontend image |
-| `docker compose restart backend` | Restart the backend container |
-| `docker compose restart frontend` | Restart the frontend container |
-| `docker compose stop` | Stop services without removing containers |
-| `docker compose start` | Start previously stopped services |
-| `docker compose down` | Stop and remove service containers and networks |
-| `docker compose down --rmi all` | Also remove the service images |
-| `docker compose config` | Show the resolved Compose configuration |
+| Command                           | Purpose                                           |
+| --------------------------------- | ------------------------------------------------- |
+| `docker compose up --build -d`    | Build images and start services in the background |
+| `docker compose up -d`            | Start services using existing images              |
+| `docker compose ps`               | Show container status and ports                   |
+| `docker compose logs -f`          | Stream logs from both services                    |
+| `docker compose logs -f backend`  | Stream API logs                                   |
+| `docker compose logs -f frontend` | Stream website logs                               |
+| `docker compose build backend`    | Rebuild the backend image                         |
+| `docker compose build frontend`   | Rebuild the frontend image                        |
+| `docker compose restart backend`  | Restart the backend container                     |
+| `docker compose restart frontend` | Restart the frontend container                    |
+| `docker compose stop`             | Stop services without removing containers         |
+| `docker compose start`            | Start previously stopped services                 |
+| `docker compose down`             | Stop and remove service containers and networks   |
+| `docker compose down --rmi all`   | Also remove the service images                    |
+| `docker compose config`           | Show the resolved Compose configuration           |
 
 Be careful when sharing `docker compose config` output; it can include environment values. `down --rmi all` removes built images, so the next start will need a rebuild.
 
@@ -194,15 +194,15 @@ The backend allows requests from `FRONTEND_URL` through CORS. When moving this s
 
 ## Troubleshooting
 
-| Problem | What to check |
-| --- | --- |
-| Compose reports a missing env file | `backend/.env` and `frontend/.env` exist at the correct paths |
-| Frontend calls the wrong API URL | Root `.env` build argument; rebuild the frontend image |
-| Menu does not load during server rendering | Backend status and `INTERNAL_API_URL` in Compose |
-| Database connection fails | MongoDB hostname and network access from inside the container |
-| CORS errors | `FRONTEND_URL` matches the website origin |
-| Google sign-in fails | OAuth credentials and registered callback URI |
-| Image uploads fail | R2 bucket, credentials, and public domain |
-| Port is already in use | Another process or container is using `3000` or `5000` |
+| Problem                                    | What to check                                                 |
+| ------------------------------------------ | ------------------------------------------------------------- |
+| Compose reports a missing env file         | `backend/.env` and `frontend/.env` exist at the correct paths |
+| Frontend calls the wrong API URL           | Root `.env` build argument; rebuild the frontend image        |
+| Menu does not load during server rendering | Backend status and `INTERNAL_API_URL` in Compose              |
+| Database connection fails                  | MongoDB hostname and network access from inside the container |
+| CORS errors                                | `FRONTEND_URL` matches the website origin                     |
+| Google sign-in fails                       | OAuth credentials and registered callback URI                 |
+| Image uploads fail                         | R2 bucket, credentials, and public domain                     |
+| Port is already in use                     | Another process or container is using `3000` or `5000`        |
 
 This setup currently has two application containers only. It does not include a database container, reverse proxy, HTTPS termination, or health checks. Those would need to be configured separately for a production container deployment.
