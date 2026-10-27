@@ -12,18 +12,18 @@ Website: [kochigurupizza.com](https://kochigurupizza.com)
 
 ## Tech stack
 
-| Area | Technology | Used for |
-| --- | --- | --- |
-| Frontend | Next.js 16, React 19, TypeScript | Website, routing, rendering, and dashboard |
-| Styling | Tailwind CSS 4, Framer Motion | Layout, styling, and animations |
-| UI | Embla Carousel, Lucide React, React Hot Toast | Carousels, icons, and feedback messages |
-| Backend | Node.js, Express 5, TypeScript | REST API and business logic |
-| Database | MongoDB, Mongoose | User and menu records |
-| Authentication | Passport.js, JWT, Google OAuth 2.0 | Sign-in, token handling, and protected routes |
-| File storage | Cloudflare R2, AWS S3 SDK | Menu image storage |
-| Validation | Zod | API request validation |
-| Code quality | ESLint, Prettier | Linting and formatting |
-| CI | GitHub Actions | Checks on pushes and pull requests |
+| Area           | Technology                                    | Used for                                      |
+| -------------- | --------------------------------------------- | --------------------------------------------- |
+| Frontend       | Next.js 16, React 19, TypeScript              | Website, routing, rendering, and dashboard    |
+| Styling        | Tailwind CSS 4, Framer Motion                 | Layout, styling, and animations               |
+| UI             | Embla Carousel, Lucide React, React Hot Toast | Carousels, icons, and feedback messages       |
+| Backend        | Node.js, Express 5, TypeScript                | REST API and business logic                   |
+| Database       | MongoDB, Mongoose                             | User and menu records                         |
+| Authentication | Passport.js, JWT, Google OAuth 2.0            | Sign-in, token handling, and protected routes |
+| File storage   | Cloudflare R2, AWS S3 SDK                     | Menu image storage                            |
+| Validation     | Zod                                           | API request validation                        |
+| Code quality   | ESLint, Prettier                              | Linting and formatting                        |
+| CI             | GitHub Actions                                | Checks on pushes and pull requests            |
 
 ## How the project works
 
@@ -55,13 +55,13 @@ For authentication, the backend handles password verification, JWT access tokens
 
 ### What is available now
 
-| Part | Current functionality |
-| --- | --- |
-| Public site | Home page, promotional content, menu, item details, about and contact pages |
-| Accounts | Registration, email/password sign-in, Google sign-in, logout, current-user endpoint |
-| Menu dashboard | Create and update items, search/filter items, change availability, manage images |
+| Part           | Current functionality                                                                 |
+| -------------- | ------------------------------------------------------------------------------------- |
+| Public site    | Home page, promotional content, menu, item details, about and contact pages           |
+| Accounts       | Registration, email/password sign-in, Google sign-in, logout, current-user endpoint   |
+| Menu dashboard | Create and update items, search/filter items, change availability, manage images      |
 | Access control | Staff/admin permission checks for menu updates; admin-only delete and image endpoints |
-| Backend | Auth, menu, and image APIs under `/v1` |
+| Backend        | Auth, menu, and image APIs under `/v1`                                                |
 
 Dashboard routes for orders, analytics, promotions, staff, store, and settings currently show a **Coming Soon** page. They should not be treated as completed modules.
 
@@ -119,8 +119,17 @@ These commands work in Windows PowerShell and Linux Bash:
 ```bash
 git clone https://github.com/ishara-dhanushan/kochi-guru-pizza.git
 cd kochi-guru-pizza
-npm --prefix backend ci
-npm --prefix frontend ci
+
+# Install backend dependencies
+cd backend
+npm ci
+
+# Install frontend dependencies
+cd ../frontend
+npm ci
+
+# Return to the repository root
+cd ..
 ```
 
 `npm ci` installs from each application's lockfile. Use `npm install` in the relevant directory when intentionally adding or updating dependencies.
@@ -178,20 +187,22 @@ Start MongoDB first, then run each application in its own terminal from the repo
 **Terminal 1 — backend**
 
 ```bash
-npm --prefix backend run dev
+cd backend
+npm run dev
 ```
 
 **Terminal 2 — frontend**
 
 ```bash
-npm --prefix frontend run dev
+cd frontend
+npm run dev
 ```
 
-| Service | Local URL |
-| --- | --- |
-| Website | [http://localhost:3000](http://localhost:3000) |
-| Backend root | [http://localhost:5000](http://localhost:5000) |
-| Menu API | [http://localhost:5000/v1/menu](http://localhost:5000/v1/menu) |
+| Service      | Local URL                                                      |
+| ------------ | -------------------------------------------------------------- |
+| Website      | [http://localhost:3000](http://localhost:3000)                 |
+| Backend root | [http://localhost:5000](http://localhost:5000)                 |
+| Menu API     | [http://localhost:5000/v1/menu](http://localhost:5000/v1/menu) |
 
 The backend uses `tsx watch` in development, while Next.js uses its own development server. Changes to either application are picked up by its respective process.
 
@@ -215,29 +226,25 @@ The endpoint returns menu data from MongoDB. An empty menu is possible if you ha
 
 ## Available npm commands
 
-Run these from the **repository root**. All commands below are valid in both PowerShell and Bash.
+Run these commands from inside `frontend/` or `backend/`, depending on which application you are working on. For example, from the repository root:
 
-| Frontend command | Purpose |
-| --- | --- |
-| `npm --prefix frontend ci` | Install the exact versions from `package-lock.json` |
-| `npm --prefix frontend run dev` | Start the Next.js development server |
-| `npm --prefix frontend run build` | Build the production frontend |
-| `npm --prefix frontend run start` | Serve the previously built frontend |
-| `npm --prefix frontend run lint` | Run ESLint |
-| `npm --prefix frontend run format:check` | Check formatting without changing files |
-| `npm --prefix frontend run format` | Format files with Prettier |
+```bash
+cd frontend
+```
 
-| Backend command | Purpose |
-| --- | --- |
-| `npm --prefix backend ci` | Install the exact versions from `package-lock.json` |
-| `npm --prefix backend run dev` | Start the API using `tsx watch` |
-| `npm --prefix backend run build` | Run lint and compile TypeScript into `dist/` |
-| `npm --prefix backend run start` | Run `dist/server.js` |
-| `npm --prefix backend run lint` | Run ESLint |
-| `npm --prefix backend run format:check` | Check formatting without changing files |
-| `npm --prefix backend run format` | Format files with Prettier |
+For the backend, use `cd backend` instead. Both directories have their own `package.json` and `package-lock.json` files. The same npm commands are available in both applications:
 
-Run the relevant `build` command before `start`. There is no automated `test` script defined in either application's current `package.json`. The repository's CI checks formatting, linting, and builds, but does not currently run a test suite.
+| Command                | Purpose                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `npm ci`               | Install dependencies from `package-lock.json`                                    |
+| `npm run dev`          | Start the development server (Next.js in `frontend/`, `tsx watch` in `backend/`) |
+| `npm run build`        | Create a production build (Next.js build or TypeScript compilation with linting) |
+| `npm run start`        | Start the built application                                                      |
+| `npm run lint`         | Run ESLint                                                                       |
+| `npm run format:check` | Check Prettier formatting without changing files                                 |
+| `npm run format`       | Format files with Prettier                                                       |
+
+Run `npm run build` before `npm run start`. There is no automated `test` script defined in either application's current `package.json`. The repository's CI checks formatting, linting, and builds, but does not currently run a test suite.
 
 ## Backend API
 
@@ -245,15 +252,15 @@ All API endpoints are mounted under `/v1`. For local development, the base URL i
 
 ### Authentication
 
-| Method | Endpoint | Access |
-| --- | --- | --- |
-| `POST` | `/auth/register` | Public |
-| `POST` | `/auth/login` | Public |
-| `POST` | `/auth/refresh` | Valid refresh token required |
-| `POST` | `/auth/logout` | Authenticated |
-| `GET` | `/auth/me` | Authenticated |
-| `GET` | `/auth/google` | Starts Google sign-in |
-| `GET` | `/auth/google/callback` | Google OAuth callback |
+| Method | Endpoint                | Access                       |
+| ------ | ----------------------- | ---------------------------- |
+| `POST` | `/auth/register`        | Public                       |
+| `POST` | `/auth/login`           | Public                       |
+| `POST` | `/auth/refresh`         | Valid refresh token required |
+| `POST` | `/auth/logout`          | Authenticated                |
+| `GET`  | `/auth/me`              | Authenticated                |
+| `GET`  | `/auth/google`          | Starts Google sign-in        |
+| `GET`  | `/auth/google/callback` | Google OAuth callback        |
 
 The API uses bearer access tokens for protected requests:
 
@@ -265,23 +272,23 @@ Refresh tokens are tracked against the user's record in MongoDB and replaced whe
 
 ### Menu management
 
-| Method | Endpoint | Access |
-| --- | --- | --- |
-| `GET` | `/menu` | Public |
-| `GET` | `/menu/:id` | Public |
-| `POST` | `/menu` | Admin or staff |
-| `PUT` | `/menu/:id` | Admin or staff |
-| `DELETE` | `/menu/:id` | Admin only |
+| Method   | Endpoint    | Access         |
+| -------- | ----------- | -------------- |
+| `GET`    | `/menu`     | Public         |
+| `GET`    | `/menu/:id` | Public         |
+| `POST`   | `/menu`     | Admin or staff |
+| `PUT`    | `/menu/:id` | Admin or staff |
+| `DELETE` | `/menu/:id` | Admin only     |
 
 Menu records include a name, category, description fields, availability, image URLs, and sort order. Pricing supports either a single `price` or a list of size/price `variants`. Input is checked by the Zod schemas in `backend/src/schemas/` before the controller processes it.
 
 ### Images
 
-| Method | Endpoint | Access |
-| --- | --- | --- |
-| `POST` | `/images` | Admin only |
-| `DELETE` | `/images` | Admin only |
-| `POST` | `/images/cleanup` | Admin only |
+| Method   | Endpoint          | Access     |
+| -------- | ----------------- | ---------- |
+| `POST`   | `/images`         | Admin only |
+| `DELETE` | `/images`         | Admin only |
+| `POST`   | `/images/cleanup` | Admin only |
 
 Images are uploaded to Cloudflare R2. The upload endpoint accepts a multipart field named `file`, supports JPEG/PNG/WebP, and has a **5 MB file-size limit**. Image URLs are referenced by menu records in MongoDB; the files themselves are not stored in the database.
 
@@ -291,16 +298,24 @@ The cleanup endpoint checks for R2 objects that are not referenced by menu items
 
 The workflow at [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs for pushes to `main` and pull requests targeting `main`. Frontend and backend checks run as separate jobs using **Node.js 24**.
 
-Both jobs install dependencies, check Prettier formatting, run ESLint, and create a production build. To run the same checks locally:
+Both jobs install dependencies, check Prettier formatting, run ESLint, and create a production build. To run the same checks locally, use the following commands from the repository root.
+
+**Frontend:**
 
 ```bash
-npm --prefix frontend run format:check
-npm --prefix frontend run lint
-npm --prefix frontend run build
+cd frontend
+npm run format:check
+npm run lint
+npm run build
+```
 
-npm --prefix backend run format:check
-npm --prefix backend run lint
-npm --prefix backend run build
+**Backend:**
+
+```bash
+cd backend
+npm run format:check
+npm run lint
+npm run build
 ```
 
 ## Deployment notes
@@ -319,17 +334,17 @@ For Next.js, `NEXT_PUBLIC_` variables are included in the browser build, so use 
 
 ## Troubleshooting
 
-| Problem | What to check |
-| --- | --- |
-| Backend exits on startup | Required values in `backend/.env`; the error lists missing variables |
-| MongoDB connection fails | Connection string, database availability, and network access |
-| Menu is empty | Backend logs, MongoDB contents, and the `/v1/menu` API response |
-| Browser requests fail | `NEXT_PUBLIC_API_URL` and `/v1` prefix |
-| Server-rendered menu fails | `INTERNAL_API_URL` (if set) and backend reachability |
-| CORS error | `FRONTEND_URL` matches the browser's frontend origin |
-| Google sign-in fails | OAuth client credentials and exact authorized callback URL |
-| Image uploads fail | R2 credentials, bucket permissions, and public domain |
-| `npm run start` fails | Build the appropriate application first |
+| Problem                    | What to check                                                        |
+| -------------------------- | -------------------------------------------------------------------- |
+| Backend exits on startup   | Required values in `backend/.env`; the error lists missing variables |
+| MongoDB connection fails   | Connection string, database availability, and network access         |
+| Menu is empty              | Backend logs, MongoDB contents, and the `/v1/menu` API response      |
+| Browser requests fail      | `NEXT_PUBLIC_API_URL` and `/v1` prefix                               |
+| Server-rendered menu fails | `INTERNAL_API_URL` (if set) and backend reachability                 |
+| CORS error                 | `FRONTEND_URL` matches the browser's frontend origin                 |
+| Google sign-in fails       | OAuth client credentials and exact authorized callback URL           |
+| Image uploads fail         | R2 credentials, bucket permissions, and public domain                |
+| `npm run start` fails      | Build the appropriate application first                              |
 
 ## Making changes
 
