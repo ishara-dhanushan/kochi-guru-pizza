@@ -109,7 +109,7 @@ export default function VisitUsSection() {
             transition={{ duration: 0.6 }}
             className="lg:col-span-3 gpu-fix"
           >
-            <div className="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-smooth duration-300 border border-gray-100 dark:border-gray-700 h-[420px]">
+            <div className="rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-smooth duration-300 border border-gray-100 dark:border-gray-700 h-105">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.8!2d80.6973356!3d6.150403!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae14bf48d6f7b07%3A0xfe7cb83da3e3b9da!2sKochi%20Guru%20Pizza!5e0!3m2!1sen!2slk!4v1740000000000!5m2!1sen!2slk"
                 width="100%"

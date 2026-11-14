@@ -1,112 +1,204 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Global background and foreground */
+  --background: var(--surface);
+  --foreground: var(--content-main);
 
   /* Brand */
-  --color-brand: var(--color-orange-600);
-  --color-brand-muted: var(--color-orange-500);
-  --color-brand-subtle: var(--color-orange-400);
-  --color-brand-wash: var(--color-orange-50);
-
-  /* Danger */
-  --color-danger: var(--color-red-500);
-  --color-danger-wash: var(--color-red-50);
-
-  /* Success */
-  --color-success: var(--color-green-600);
+  --brand: var(--color-orange-500);
+  --brand-hover: var(--color-orange-600);
+  --brand-muted: var(--color-orange-400);
+  --brand-subtle: var(--color-orange-400);
+  --brand-on: var(--color-white);
+  --brand-inverse: var(--color-orange-400);
 
   /* Surfaces */
-  --color-surface: var(--color-white);
-  --color-surface-card: var(--color-white);
-  --color-surface-sub: var(--color-gray-50);
-  --color-surface-raised: var(--color-gray-100);
+  --surface: var(--color-white);
+  --surface-hover: var(--color-gray-100);
+  --surface-card: var(--color-white);
+  --surface-card-hover: var(--color-gray-100);
+  --surface-soft: var(--color-gray-100);
+  --surface-soft-hover: var(--color-gray-200);
+  --surface-inverse: var(--color-gray-900);
 
-  /* Text */
-  --color-ink: var(--color-gray-900);
-  --color-ink-muted: var(--color-gray-600);
-  --color-ink-faint: var(--color-gray-500);
-  --color-ink-brand: var(--color-orange-600);
+  /* Content (Text) */
+  --content-main: var(--color-gray-900);
+  --content-subtle: var(--color-gray-700);
+  --content-muted: var(--color-gray-600);
+  --content-faint: var(--color-gray-500);
 
-  /* Borders */
-  --color-border: var(--color-gray-200);
-  --color-border-strong: var(--color-gray-300);
+  /* Content on permanently dark surfaces */
+  --content-on-dark: var(--color-white);
+  --content-on-dark-muted: var(--color-gray-400);
+
+  /* Dividers (Borders) */
+  --divider-subtle: var(--color-gray-100);
+  --divider-standard: var(--color-gray-200);
+  --divider-strong: var(--color-gray-300);
+  --divider-inverse: var(--color-gray-800);
+
+  /* Feedback: Danger */
+  --danger: var(--color-red-600);
+  --danger-wash: var(--color-red-50);
+  --danger-border: var(--color-red-200);
+  --danger-solid: var(--color-red-600);
+
+  /* Feedback: Success */
+  --success: var(--color-green-600);
+  --success-wash: var(--color-green-50);
+  --success-border: var(--color-green-200);
+  --success-solid: var(--color-green-600);
+
+  /* Feedback: Warning */
+  --warning: var(--color-amber-600);
+  --warning-wash: var(--color-amber-50);
+  --warning-border: var(--color-amber-200);
+
+  /* Feedback: Information */
+  --info: var(--color-blue-600);
+  --info-wash: var(--color-blue-50);
+  --info-border: var(--color-blue-200);
+
+  /* Foreground on solid feedback backgrounds */
+  --feedback-on: var(--color-white);
+
+  /* Overlays, shadows and subtle outlines */
+  --overlay: var(--color-black);
+  --highlight: var(--color-white);
+  --elevation: var(--color-black);
+  --edge: var(--color-black);
 }
 
 /* Use the .dark class to apply dark mode variables */
-:root:has(.dark),
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-
+:root.dark {
   /* Brand */
-  --color-brand: var(--color-orange-500);
-  --color-brand-muted: var(--color-orange-400);
-  --color-brand-subtle: var(--color-orange-400);
-  --color-brand-wash: var(--color-orange-950);
-
-  /* Danger */
-  --color-danger: var(--color-red-500);
-  --color-danger-wash: var(--color-red-950);
-
-  /* Success */
-  --color-success: var(--color-green-500);
+  --brand: var(--color-orange-600);
+  --brand-hover: var(--color-orange-700);
+  --brand-muted: var(--color-orange-500);
+  --brand-subtle: var(--color-orange-400);
 
   /* Surfaces */
-  --color-surface: var(--color-gray-950);
-  --color-surface-card: var(--color-gray-800);
-  --color-surface-sub: var(--color-gray-900);
-  --color-surface-raised: var(--color-gray-800);
+  --surface: var(--color-gray-950);
+  --surface-hover: var(--color-gray-800);
+  --surface-card: var(--color-gray-800);
+  --surface-card-hover: var(--color-gray-700);
+  --surface-soft: var(--color-gray-900);
+  --surface-soft-hover: var(--color-gray-800);
+  --surface-inverse: var(--color-black);
 
-  /* Text */
-  --color-ink: var(--color-gray-100);
-  --color-ink-muted: var(--color-gray-400);
-  --color-ink-faint: var(--color-gray-500);
-  --color-ink-brand: var(--color-orange-500);
+  /* Content (Text) */
+  --content-main: var(--color-gray-100);
+  --content-subtle: var(--color-gray-300);
+  --content-muted: var(--color-gray-400);
+  --content-faint: var(--color-gray-500);
 
-  /* Borders */
-  --color-border: var(--color-gray-700);
-  --color-border-strong: var(--color-gray-600);
+  /* Dividers (Borders) */
+  --divider-subtle: var(--color-gray-800);
+  --divider-standard: var(--color-gray-700);
+  --divider-strong: var(--color-gray-600);
+
+  /* Feedback: Danger */
+  --danger: var(--color-red-400);
+  --danger-wash: var(--color-red-950);
+  --danger-border: var(--color-red-800);
+
+  /* Feedback: Success */
+  --success: var(--color-green-400);
+  --success-wash: var(--color-green-950);
+  --success-border: var(--color-green-800);
+
+  /* Feedback: Warning */
+  --warning: var(--color-amber-400);
+  --warning-wash: var(--color-amber-950);
+  --warning-border: var(--color-amber-800);
+
+  /* Feedback: Information */
+  --info: var(--color-blue-400);
+  --info-wash: var(--color-blue-950);
+  --info-border: var(--color-blue-800);
+
+  /* Overlays, shadows and subtle outlines */
+  --edge: var(--color-white);
 }
 
 @theme inline {
+  /* Global background, foreground and fonts */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins);
   --font-heading: var(--font-montserrat);
 
   /* Brand */
-  --color-brand: var(--color-brand);
-  --color-brand-muted: var(--color-brand-muted);
-  --color-brand-subtle: var(--color-brand-subtle);
-  --color-brand-wash: var(--color-brand-wash);
-
-  /* Danger */
-  --color-danger: var(--color-danger);
-  --color-danger-wash: var(--color-danger-wash);
-
-  /* Success */
-  --color-success: var(--color-success);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-brand-on: var(--brand-on);
+  --color-brand-inverse: var(--brand-inverse);
 
   /* Surfaces */
-  --color-surface: var(--color-surface);
-  --color-surface-card: var(--color-surface-card);
-  --color-surface-sub: var(--color-surface-sub);
-  --color-surface-raised: var(--color-surface-raised);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-hover: var(--surface-card-hover);
+  --color-surface-soft: var(--surface-soft);
+  --color-surface-soft-hover: var(--surface-soft-hover);
+  --color-surface-inverse: var(--surface-inverse);
 
-  /* Text */
-  --color-ink: var(--color-ink);
-  --color-ink-muted: var(--color-ink-muted);
-  --color-ink-faint: var(--color-ink-faint);
-  --color-ink-brand: var(--color-ink-brand);
+  /* Content */
+  --color-content-main: var(--content-main);
+  --color-content-subtle: var(--content-subtle);
+  --color-content-muted: var(--content-muted);
+  --color-content-faint: var(--content-faint);
 
-  /* Borders */
-  --color-border: var(--color-border);
-  --color-border-strong: var(--color-border-strong);
+  /* Content on permanently dark surfaces */
+  --color-content-on-dark: var(--content-on-dark);
+  --color-content-on-dark-muted: var(--content-on-dark-muted);
+
+  /* Dividers */
+  --color-divider-subtle: var(--divider-subtle);
+  --color-divider-standard: var(--divider-standard);
+  --color-divider-strong: var(--divider-strong);
+  --color-divider-inverse: var(--divider-inverse);
+
+  /* Feedback: Danger */
+  --color-danger: var(--danger);
+  --color-danger-wash: var(--danger-wash);
+  --color-danger-border: var(--danger-border);
+  --color-danger-solid: var(--danger-solid);
+
+  /* Feedback: Success */
+  --color-success: var(--success);
+  --color-success-wash: var(--success-wash);
+  --color-success-border: var(--success-border);
+  --color-success-solid: var(--success-solid);
+
+  /* Feedback: Warning */
+  --color-warning: var(--warning);
+  --color-warning-wash: var(--warning-wash);
+  --color-warning-border: var(--warning-border);
+
+  /* Feedback: Information */
+  --color-info: var(--info);
+  --color-info-wash: var(--info-wash);
+  --color-info-border: var(--info-border);
+
+  /* Foreground on solid feedback backgrounds */
+  --color-feedback-on: var(--feedback-on);
+
+  /* Overlays, shadows and subtle outlines */
+  --color-overlay: var(--overlay);
+  --color-highlight: var(--highlight);
+  --color-elevation: var(--elevation);
+  --color-edge: var(--edge);
+
+  /* Floating action button shadow */
+  --shadow-floating: 0 8px 30px var(--elevation);
 }
 
-@variant dark (&:where(.dark, .dark *));
+/* Apply dark variants when the dark class is active */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @utility gpu-fix {
   transform: translateZ(0);
@@ -129,40 +221,39 @@
   transition-duration: var(--tw-duration, var(--default-transition-duration));
 }
 
-/*  Hero banners & CTA sections
-    Used: MenuHeroBanner, about/HeroBanner, contact/HeroBanner, CtaBanner
-    Replaces: bg-linear-to-br from-orange-600 via-orange-500 to-red-500    */
+/*  Hero banners & CTA sections */
 @utility bg-hero-brand-gradient {
   @apply bg-linear-to-br from-orange-600 via-orange-500 to-red-500;
+
   @variant dark {
-    @apply bg-linear-to-br from-orange-700 via-orange-600 to-red-600;
+    @apply from-orange-700 via-orange-600 to-red-600;
   }
 }
 
-/*  Primary CTA buttons
-    Used: LoginForm, RegisterForm, MenuHighlights, VisitUsSection, ContactForm, dashboard/menu
-    Replaces: bg-linear-to-r from-orange-600 to-orange-500                  */
+/*  Primary CTA buttons */
 @utility bg-brand-btn {
   @apply bg-linear-to-r from-orange-600 to-orange-500;
+
   @variant dark {
-    @apply bg-linear-to-r from-orange-600 to-orange-500;
+    @apply from-orange-700 to-orange-600;
   }
 }
 
-@utility bg-brand-btn-dark {
-  @apply bg-linear-to-r from-orange-700 to-orange-600;
+/* Primary CTA button hover state */
+@utility bg-brand-btn-hover {
+  @apply bg-linear-to-r from-orange-500 to-orange-400;
+
   @variant dark {
-    @apply bg-linear-to-r from-orange-700 to-orange-600;
+    @apply from-orange-600 to-orange-500;
   }
 }
 
-/*  Icon blobs — circular/rounded elements with brand gradient
-    Used: WhyChooseUs, ContactForm, VisitUsSection, MenuHighlights, BehindTheScenes
-    Replaces: bg-linear-to-br from-orange-400 to-orange-600                 */
+/*  Icon blobs */
 @utility bg-blob-gradient {
   @apply bg-linear-to-br from-orange-400 to-orange-600;
+
   @variant dark {
-    @apply bg-linear-to-br from-orange-400 to-orange-600;
+    @apply from-orange-500 to-orange-700;
   }
 }
 

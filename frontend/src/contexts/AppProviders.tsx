@@ -23,29 +23,29 @@ export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
           toastOptions={{
             duration: 3000,
             style: {
-              background: "#333",
-              color: "#fff"
+              background: "var(--surface-inverse)",
+              color: "var(--content-on-dark)"
             },
             success: {
               duration: 3000,
               style: {
-                background: "#10b981",
-                color: "#fff"
+                background: "var(--success-solid)",
+                color: "var(--feedback-on)"
               },
               iconTheme: {
-                primary: "#fff",
-                secondary: "#10b981"
+                primary: "var(--feedback-on)",
+                secondary: "var(--success-solid)"
               }
             },
             error: {
               duration: 4000,
               style: {
-                background: "#ef4444",
-                color: "#fff"
+                background: "var(--danger-solid)",
+                color: "var(--feedback-on)"
               },
               iconTheme: {
-                primary: "#fff",
-                secondary: "#ef4444"
+                primary: "var(--feedback-on)",
+                secondary: "var(--danger-solid)"
               }
             }
           }}

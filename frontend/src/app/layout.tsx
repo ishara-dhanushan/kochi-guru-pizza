@@ -115,7 +115,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${montserrat.variable} ${poppins.variable} antialiased bg-white dark:bg-gray-950`}
+        className={`${montserrat.variable} ${poppins.variable} antialiased`}
       >
         <AppProviders>
           <main className="min-h-screen">{children}</main>
