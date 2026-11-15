@@ -10,6 +10,8 @@
   --brand-hover: var(--color-orange-600);
   --brand-muted: var(--color-orange-400);
   --brand-subtle: var(--color-orange-400);
+  --brand-wash: var(--color-orange-50);
+  --brand-decoration: var(--color-orange-100);
   --brand-on: var(--color-white);
   --brand-inverse: var(--color-orange-400);
 
@@ -20,6 +22,10 @@
   --surface-card-hover: var(--color-gray-100);
   --surface-soft: var(--color-gray-100);
   --surface-soft-hover: var(--color-gray-200);
+  --surface-alternate: var(--color-orange-50);
+  --surface-inset: var(--color-gray-100);
+  --surface-placeholder: var(--color-gray-200);
+  --surface-control-hover: var(--color-orange-50);
   --surface-inverse: var(--color-gray-900);
 
   /* Content (Text) */
@@ -36,13 +42,21 @@
   --divider-subtle: var(--color-gray-100);
   --divider-standard: var(--color-gray-200);
   --divider-strong: var(--color-gray-300);
+  --divider-card: var(--color-gray-100);
+  --divider-control: var(--color-gray-200);
   --divider-inverse: var(--color-gray-800);
+
+  /* Indicators */
+  --indicator-inactive: var(--color-gray-300);
+  --rating-empty: var(--color-gray-200);
 
   /* Feedback: Danger */
   --danger: var(--color-red-600);
   --danger-wash: var(--color-red-50);
   --danger-border: var(--color-red-200);
   --danger-solid: var(--color-red-600);
+  --danger-action: var(--color-red-500);
+  --danger-action-hover: var(--color-red-600);
 
   /* Feedback: Success */
   --success: var(--color-green-600);
@@ -63,10 +77,7 @@
   /* Foreground on solid feedback backgrounds */
   --feedback-on: var(--color-white);
 
-  /* Overlays, shadows and subtle outlines */
-  --overlay: var(--color-black);
-  --highlight: var(--color-white);
-  --elevation: var(--color-black);
+  /* Subtle outlines */
   --edge: var(--color-black);
 }
 
@@ -77,6 +88,8 @@
   --brand-hover: var(--color-orange-700);
   --brand-muted: var(--color-orange-500);
   --brand-subtle: var(--color-orange-400);
+  --brand-wash: var(--color-orange-900);
+  --brand-decoration: var(--color-orange-900);
 
   /* Surfaces */
   --surface: var(--color-gray-950);
@@ -85,6 +98,10 @@
   --surface-card-hover: var(--color-gray-700);
   --surface-soft: var(--color-gray-900);
   --surface-soft-hover: var(--color-gray-800);
+  --surface-alternate: var(--color-gray-900);
+  --surface-inset: var(--color-gray-800);
+  --surface-placeholder: var(--color-gray-700);
+  --surface-control-hover: var(--color-gray-700);
   --surface-inverse: var(--color-black);
 
   /* Content (Text) */
@@ -97,6 +114,12 @@
   --divider-subtle: var(--color-gray-800);
   --divider-standard: var(--color-gray-700);
   --divider-strong: var(--color-gray-600);
+  --divider-card: var(--color-gray-700);
+  --divider-control: var(--color-gray-600);
+
+  /* Indicators */
+  --indicator-inactive: var(--color-gray-600);
+  --rating-empty: var(--color-gray-600);
 
   /* Feedback: Danger */
   --danger: var(--color-red-400);
@@ -118,7 +141,7 @@
   --info-wash: var(--color-blue-950);
   --info-border: var(--color-blue-800);
 
-  /* Overlays, shadows and subtle outlines */
+  /* Subtle outlines */
   --edge: var(--color-white);
 }
 
@@ -129,11 +152,16 @@
   --font-sans: var(--font-poppins);
   --font-heading: var(--font-montserrat);
 
+  /* Default transition settings */
+  --default-transition-duration: 300ms;
+
   /* Brand */
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-muted: var(--brand-muted);
   --color-brand-subtle: var(--brand-subtle);
+  --color-brand-wash: var(--brand-wash);
+  --color-brand-decoration: var(--brand-decoration);
   --color-brand-on: var(--brand-on);
   --color-brand-inverse: var(--brand-inverse);
 
@@ -144,6 +172,10 @@
   --color-surface-card-hover: var(--surface-card-hover);
   --color-surface-soft: var(--surface-soft);
   --color-surface-soft-hover: var(--surface-soft-hover);
+  --color-surface-alternate: var(--surface-alternate);
+  --color-surface-inset: var(--surface-inset);
+  --color-surface-placeholder: var(--surface-placeholder);
+  --color-surface-control-hover: var(--surface-control-hover);
   --color-surface-inverse: var(--surface-inverse);
 
   /* Content */
@@ -160,13 +192,21 @@
   --color-divider-subtle: var(--divider-subtle);
   --color-divider-standard: var(--divider-standard);
   --color-divider-strong: var(--divider-strong);
+  --color-divider-card: var(--divider-card);
+  --color-divider-control: var(--divider-control);
   --color-divider-inverse: var(--divider-inverse);
+
+  /* Indicators */
+  --color-indicator-inactive: var(--indicator-inactive);
+  --color-rating-empty: var(--rating-empty);
 
   /* Feedback: Danger */
   --color-danger: var(--danger);
   --color-danger-wash: var(--danger-wash);
   --color-danger-border: var(--danger-border);
   --color-danger-solid: var(--danger-solid);
+  --color-danger-action: var(--danger-action);
+  --color-danger-action-hover: var(--danger-action-hover);
 
   /* Feedback: Success */
   --color-success: var(--success);
@@ -187,14 +227,11 @@
   /* Foreground on solid feedback backgrounds */
   --color-feedback-on: var(--feedback-on);
 
-  /* Overlays, shadows and subtle outlines */
-  --color-overlay: var(--overlay);
-  --color-highlight: var(--highlight);
-  --color-elevation: var(--elevation);
+  /* Subtle outlines */
   --color-edge: var(--edge);
 
   /* Floating action button shadow */
-  --shadow-floating: 0 8px 30px var(--elevation);
+  --shadow-floating: 0 8px 30px var(--color-black);
 }
 
 /* Apply dark variants when the dark class is active */
@@ -241,10 +278,10 @@
 
 /* Primary CTA button hover state */
 @utility bg-brand-btn-hover {
-  @apply bg-linear-to-r from-orange-500 to-orange-400;
+  @apply bg-linear-to-r from-orange-700 to-orange-600;
 
   @variant dark {
-    @apply from-orange-600 to-orange-500;
+    @apply from-orange-800 to-orange-700;
   }
 }
 

@@ -41,7 +41,7 @@ export default function FloatingThemeToggle() {
     >
       {/* Popup Menu (appears above the button) */}
       {isOpen && (
-        <div className="absolute bottom-14 right-0 mb-2 w-40 rounded-xl shadow-xl bg-surface-card border border-divider-standard overflow-hidden transform transition-all duration-200 origin-bottom-right">
+        <div className="absolute bottom-14 right-0 mb-2 w-40 rounded-xl shadow-xl bg-surface-card border border-divider-standard overflow-hidden transform transition-all origin-bottom-right">
           {options.map(({ value, icon: Icon, label }) => (
             <button
               key={value}
@@ -66,7 +66,7 @@ export default function FloatingThemeToggle() {
       {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center w-14 h-14 rounded-full! bg-surface-card text-content-muted shadow-floating shadow-elevation/12 border border-divider-subtle hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-brand/20 z-50 overflow-hidden"
+        className="flex items-center justify-center w-14 h-14 rounded-full! bg-surface-card text-content-muted shadow-floating shadow-black/12 border border-divider-control hover:scale-110 active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-brand/20 z-50 overflow-hidden"
         style={{ borderRadius: "50%" }}
         aria-label="Toggle theme"
       >

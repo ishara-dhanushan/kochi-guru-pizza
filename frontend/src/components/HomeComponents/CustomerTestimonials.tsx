@@ -122,7 +122,7 @@ export default function CustomerTestimonials() {
   const averageRating = 5;
 
   return (
-    <section className="py-16 bg-orange-50/30 dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
+    <section className="py-16 bg-surface-alternate/30 dark:bg-surface-alternate transition-colors overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -132,16 +132,16 @@ export default function CustomerTestimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 gpu-fix"
         >
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-content-main mb-3">
             What Our Customers Say
           </h2>
-          <p className="text-base text-gray-600 dark:text-gray-400 max-w-xl mx-auto mb-6">
+          <p className="text-base text-content-muted max-w-xl mx-auto mb-6">
             Don&apos;t just take our word for it — hear from our happy
             customers!
           </p>
 
           {/* Stats Row */}
-          <div className="inline-flex flex-col sm:flex-row items-center gap-4 sm:gap-6 bg-white dark:bg-gray-800 rounded-2xl px-6 py-4 sm:py-3 shadow-sm border border-gray-100 dark:border-gray-700 max-w-full">
+          <div className="inline-flex flex-col sm:flex-row items-center gap-4 sm:gap-6 bg-surface-card rounded-2xl px-6 py-4 sm:py-3 shadow-sm border border-divider-card max-w-full">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -149,25 +149,23 @@ export default function CustomerTestimonials() {
                     key={i}
                     className={`w-4 h-4 ${
                       i < Math.floor(averageRating)
-                        ? "fill-orange-500 text-orange-500"
-                        : "fill-gray-300 text-gray-300 dark:fill-gray-600 dark:text-gray-600"
+                        ? "fill-brand text-brand"
+                        : "fill-rating-empty text-rating-empty"
                     }`}
                   />
                 ))}
               </div>
-              <span className="font-bold text-gray-900 dark:text-white text-sm">
+              <span className="font-bold text-content-main text-sm">
                 {averageRating.toFixed(1)}/5.0
               </span>
-              <span className="text-gray-500 dark:text-gray-400 text-sm">
-                Average
-              </span>
+              <span className="text-content-muted text-sm">Average</span>
             </div>
-            <div className="hidden sm:block w-px h-5 bg-gray-200 dark:bg-gray-600" />
+            <div className="hidden sm:block w-px h-5 bg-divider-standard" />
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-orange-600 dark:text-orange-500 text-sm">
+              <span className="font-bold text-brand text-sm">
                 {totalReviews}+
               </span>
-              <span className="text-gray-500 dark:text-gray-400 text-sm">
+              <span className="text-content-muted text-sm">
                 Happy Customers
               </span>
             </div>
@@ -188,18 +186,18 @@ export default function CustomerTestimonials() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: false, amount: 0.2 }}
                     transition={{ duration: 0.4, delay: idx * 0.05 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md transition-smooth duration-300 p-6 border border-gray-100 dark:border-gray-700 h-full flex flex-col relative gpu-fix"
+                    className="bg-surface-card rounded-2xl shadow-sm hover:shadow-md transition-smooth p-6 border border-divider-card h-full flex flex-col relative gpu-fix"
                   >
                     {/* Quote Icon */}
-                    <Quote className="absolute top-4 right-4 w-8 h-8 text-orange-100 dark:text-orange-900/40" />
+                    <Quote className="absolute top-4 right-4 w-8 h-8 text-brand-decoration dark:text-brand-decoration/40" />
 
                     {/* Customer Info */}
                     <div className="flex items-center mb-4">
                       <div>
-                        <h3 className="font-semibold text-sm text-gray-900 dark:text-white leading-tight">
+                        <h3 className="font-semibold text-sm text-content-main leading-tight">
                           {testimonial.name}
                         </h3>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                        <p className="text-xs text-content-faint">
                           {testimonial.date}
                         </p>
                       </div>
@@ -212,15 +210,15 @@ export default function CustomerTestimonials() {
                           key={i}
                           className={`w-4 h-4 ${
                             i < testimonial.rating
-                              ? "fill-orange-500 text-orange-500"
-                              : "fill-gray-200 text-gray-200 dark:fill-gray-600 dark:text-gray-600"
+                              ? "fill-brand text-brand"
+                              : "fill-rating-empty text-rating-empty"
                           }`}
                         />
                       ))}
                     </div>
 
                     {/* Review Text */}
-                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed flex-1">
+                    <p className="text-content-subtle text-sm leading-relaxed flex-1">
                       &ldquo;{testimonial.review}&rdquo;
                     </p>
                   </motion.div>
@@ -232,17 +230,17 @@ export default function CustomerTestimonials() {
           {/* Navigation Arrows */}
           <button
             onClick={scrollPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 translate-x-0 md:-translate-x-5 z-10 p-2 rounded-full! bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-600 hidden md:block"
+            className="absolute left-0 top-1/2 -translate-y-1/2 translate-x-0 md:-translate-x-5 z-10 p-2 rounded-full! bg-surface-card shadow-md hover:shadow-lg hover:bg-surface-control-hover transition-all border border-divider-control hidden md:block"
             aria-label="Previous testimonial"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            <ChevronLeft className="w-5 h-5 text-content-subtle" />
           </button>
           <button
             onClick={scrollNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-0 md:translate-x-5 z-10 p-2 rounded-full! bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-600 hidden md:block"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-0 md:translate-x-5 z-10 p-2 rounded-full! bg-surface-card shadow-md hover:shadow-lg hover:bg-surface-control-hover transition-all border border-divider-control hidden md:block"
             aria-label="Next testimonial"
           >
-            <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            <ChevronRight className="w-5 h-5 text-content-subtle" />
           </button>
         </div>
 
@@ -254,8 +252,8 @@ export default function CustomerTestimonials() {
               onClick={() => scrollTo(index)}
               className={`h-1.5 rounded-full transition-all ${
                 index === selectedIndex
-                  ? "bg-orange-600 w-6"
-                  : "bg-gray-300 dark:bg-gray-600 w-1.5 hover:bg-orange-400"
+                  ? "bg-brand w-6"
+                  : "bg-indicator-inactive w-1.5 hover:bg-brand-subtle"
               }`}
               aria-label={`Go to testimonial ${index + 1}`}
             />

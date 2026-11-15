@@ -144,13 +144,13 @@ const Header: React.FC = () => {
         initial={{ y: 0 }}
         animate={{ y: isVisible || mobileMenuOpen ? 0 : "-100%" }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed top-0 left-0 right-0 h-16 w-full z-50 bg-surface/75 backdrop-blur-lg border-b border-divider-standard/50 shadow-sm shadow-elevation/10"
+        className="fixed top-0 left-0 right-0 h-16 w-full z-50 bg-surface/75 backdrop-blur-lg border-b border-divider-standard/50 shadow-sm shadow-black/10"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-10 h-10 transition-transform group-hover:scale-105 duration-300">
+              <div className="relative w-10 h-10 transition-transform group-hover:scale-105">
                 <Image
                   src="/logo.svg"
                   alt="Kochi Guru Pizza"
@@ -185,7 +185,7 @@ const Header: React.FC = () => {
                     }`}
                   >
                     {label}
-                    <span className="absolute -bottom-0.5 left-0 h-0.5 bg-brand transition-[width] duration-300 w-0 group-hover:w-full" />
+                    <span className="absolute -bottom-0.5 left-0 h-0.5 bg-brand transition-[width] w-0 group-hover:w-full" />
                   </Link>
                 );
               })}
@@ -271,7 +271,7 @@ const Header: React.FC = () => {
                                 top: dropdownPos.top,
                                 right: dropdownPos.right
                               }}
-                              className="fixed w-56 bg-surface-card/80 backdrop-blur-lg rounded-2xl shadow-xl border border-divider-subtle py-2 overflow-hidden ring-1 ring-edge/5 z-1000"
+                              className="fixed w-56 bg-surface-card/80 backdrop-blur-lg rounded-2xl shadow-xl border border-divider-standard py-2 overflow-hidden ring-1 ring-edge/5 z-1000"
                             >
                               <div className="px-4 py-3 border-b border-divider-subtle mb-1">
                                 <p className="text-sm font-semibold text-content-main truncate">
@@ -297,7 +297,7 @@ const Header: React.FC = () => {
                                   <Link
                                     href="/dashboard"
                                     onClick={() => setDropdownOpen(false)}
-                                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-content-subtle hover:bg-brand/10 hover:text-brand transition-colors duration-300"
+                                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-content-subtle hover:bg-brand/10 hover:text-brand transition-colors"
                                   >
                                     <LayoutDashboard className="w-4 h-4" />
                                     Dashboard
@@ -311,7 +311,7 @@ const Header: React.FC = () => {
                                   logout();
                                   setDropdownOpen(false);
                                 }}
-                                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-danger hover:bg-danger-wash transition-colors duration-300 bg-transparent border-none text-left"
+                                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-danger hover:bg-danger-wash transition-colors bg-transparent border-none text-left"
                               >
                                 <LogOut className="w-4 h-4" />
                                 Logout
@@ -458,7 +458,7 @@ const Header: React.FC = () => {
                     {(user.role === "admin" || user.role === "staff") && (
                       <Link
                         href="/dashboard"
-                        className="flex items-center gap-3 px-4 py-3 text-base font-medium text-content-subtle hover:bg-brand/10 hover:text-brand rounded-xl transition-colors duration-300"
+                        className="flex items-center gap-3 px-4 py-3 text-base font-medium text-content-subtle hover:bg-brand/10 hover:text-brand rounded-xl transition-colors"
                       >
                         <LayoutDashboard className="w-5 h-5" />
                         Dashboard
@@ -467,7 +467,7 @@ const Header: React.FC = () => {
 
                     <button
                       onClick={logout}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-danger hover:bg-danger-wash rounded-xl transition-colors duration-300 text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-danger hover:bg-danger-wash rounded-xl transition-colors text-left"
                     >
                       <LogOut className="w-5 h-5" />
                       Logout
@@ -478,14 +478,14 @@ const Header: React.FC = () => {
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center w-full px-4 py-3 text-base font-semibold text-content-subtle hover:text-brand bg-surface-soft/75 hover:bg-surface-soft-hover rounded-xl transition-colors duration-300"
+                      className="flex items-center justify-center w-full px-4 py-3 text-base font-semibold text-content-subtle hover:text-brand bg-surface-soft/75 hover:bg-surface-soft-hover rounded-xl transition-colors"
                     >
                       Login
                     </Link>
                     <Link
                       href="/register"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center w-full px-4 py-3 text-base font-semibold text-brand-on bg-brand hover:bg-brand-hover rounded-xl shadow-lg shadow-brand/20 transition-all duration-300 hover:shadow-brand/30"
+                      className="flex items-center justify-center w-full px-4 py-3 text-base font-semibold text-brand-on bg-brand hover:bg-brand-hover rounded-xl shadow-lg shadow-brand/20 transition-all hover:shadow-brand/30"
                     >
                       Sign Up
                     </Link>
@@ -501,7 +501,7 @@ const Header: React.FC = () => {
               <div className="pt-2 mt-2 border-t border-divider-subtle">
                 <button
                   onClick={() => setIsThemeExpanded(!isThemeExpanded)}
-                  className="w-full flex items-center justify-between px-4 py-3 text-content-muted hover:bg-brand/10 hover:text-brand rounded-xl transition-all duration-300"
+                  className="w-full flex items-center justify-between px-4 py-3 text-content-muted hover:bg-brand/10 hover:text-brand rounded-xl transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg">
@@ -516,7 +516,7 @@ const Header: React.FC = () => {
                     <span className="font-medium">Appearance</span>
                   </div>
                   <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-200 ${
+                    className={`w-5 h-5 transition-transform ${
                       isThemeExpanded ? "rotate-180" : ""
                     }`}
                   />
@@ -534,7 +534,7 @@ const Header: React.FC = () => {
                     >
                       <button
                         onClick={() => setTheme("light")}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-300 ${
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           theme === "light"
                             ? "bg-brand/15 text-brand"
                             : "text-content-muted hover:bg-surface-hover/75"
