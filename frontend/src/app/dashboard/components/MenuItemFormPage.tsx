@@ -1,7 +1,7 @@
 // src/app/dashboard/components/MenuItemFormPage.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import toast from "react-hot-toast";
@@ -67,12 +67,16 @@ export default function MenuItemFormPage({
   const isVariantCategory = VARIANT_CATEGORIES.includes(category);
 
   // Reset pricing when category changes (only in create mode)
-  useEffect(() => {
+  const handleCategoryChange = (newCategory: MenuCategory) => {
+    if (newCategory === category) return;
+
+    setCategory(newCategory);
+
     if (!isEdit) {
       setVariants(DEFAULT_VARIANTS);
       setPrice("");
     }
-  }, [category, isEdit]);
+  };
 
   const updateVariantPrice = (size: PizzaSize, value: string) => {
     setVariants((prev) =>
@@ -184,7 +188,9 @@ export default function MenuItemFormPage({
             </label>
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value as MenuCategory)}
+              onChange={(e) =>
+                handleCategoryChange(e.target.value as MenuCategory)
+              }
               className="w-full px-4 py-2.5 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all duration-200 text-gray-900 dark:text-white"
             >
               {CATEGORIES.map((cat) => (

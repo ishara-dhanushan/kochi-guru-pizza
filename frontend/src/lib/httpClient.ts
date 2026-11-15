@@ -143,7 +143,10 @@ export const httpClient = async <T>(
                     typeof window !== "undefined" &&
                     !isPublicRoute(window.location.pathname)
                   ) {
-                    window.location.href = "/login";
+                    window.location.href = new URL(
+                      "/login",
+                      window.location.origin
+                    ).href;
                   }
                   throw new ApiError(
                     "Session expired. Please login again.",
@@ -179,7 +182,10 @@ export const httpClient = async <T>(
                   typeof window !== "undefined" &&
                   !isPublicRoute(window.location.pathname)
                 ) {
-                  window.location.href = "/login";
+                  window.location.href = new URL(
+                    "/login",
+                    window.location.origin
+                  ).href;
                 }
                 throw new ApiError(
                   "Session expired. Please login again.",
@@ -205,7 +211,10 @@ export const httpClient = async <T>(
             typeof window !== "undefined" &&
             !isPublicRoute(window.location.pathname)
           ) {
-            window.location.href = "/login";
+            window.location.href = new URL(
+              "/login",
+              window.location.origin
+            ).href;
           }
           throw new Error("Unauthorized");
         }

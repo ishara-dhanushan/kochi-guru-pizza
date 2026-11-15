@@ -36,23 +36,49 @@ export default function MenuManagementPage() {
   >("all");
   const [deletingItem, setDeletingItem] = useState<MenuItem | null>(null);
 
-  const fetchItems = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
-    else setRefreshing(true);
-    try {
-      const data = await menuService.getMenuItems();
-      setItems(data);
-    } catch {
-      toast.error("Failed to load menu items");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  // Fetch menu items and ignore responses from obsolete requests.
+  const fetchItems = useCallback(
+    (shouldIgnore: () => boolean = () => false) => {
+      return menuService
+        .getMenuItems()
+        .then((data) => {
+          if (!shouldIgnore()) {
+            setItems(data);
+          }
+        })
+        .catch(() => {
+          if (!shouldIgnore()) {
+            toast.error("Failed to load menu items");
+          }
+        })
+        .finally(() => {
+          if (!shouldIgnore()) {
+            setLoading(false);
+            setRefreshing(false);
+          }
+        });
+    },
+    []
+  );
 
+  // Load menu items when the page mounts.
   useEffect(() => {
-    fetchItems();
+    let ignore = false;
+
+    void fetchItems(() => ignore);
+
+    return () => {
+      ignore = true;
+    };
   }, [fetchItems]);
+
+  // Refresh the list without replacing it with the initial loading screen.
+  const handleRefresh = async () => {
+    if (loading || refreshing) return;
+
+    setRefreshing(true);
+    await fetchItems();
+  };
 
   const handleDelete = async () => {
     if (!deletingItem) return;
@@ -125,8 +151,8 @@ export default function MenuManagementPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => fetchItems(true)}
-            disabled={refreshing}
+            onClick={handleRefresh}
+            disabled={loading || refreshing}
             className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-orange-500 hover:border-orange-300 dark:hover:border-orange-700 transition-all duration-200 disabled:opacity-60"
           >
             <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />

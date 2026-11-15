@@ -1,8 +1,13 @@
 // src/components/ScrollAnimatedItem.tsx
 "use client";
 
-import { motion, useInView, UseInViewOptions } from "framer-motion";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useAnimationControls,
+  useInView,
+  UseInViewOptions
+} from "framer-motion";
+import { ReactNode, useEffect, useRef } from "react";
 import { useStaggerCoordinator } from "@components/ScrollAnimatedList";
 
 interface ScrollAnimatedItemProps {
@@ -64,41 +69,48 @@ export default function ScrollAnimatedItem({
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, amount, margin });
   const coordinator = useStaggerCoordinator();
-
-  const [visible, setVisible] = useState(false);
-  const [delay, setDelay] = useState(initialDelay);
+  const controls = useAnimationControls();
 
   useEffect(() => {
-    let isMounted = true;
+    let active = true;
 
     if (isInView) {
       if (coordinator) {
-        coordinator.register((d) => {
-          if (isMounted) {
-            setDelay(d + initialDelay);
-            setVisible(true);
-          }
+        // Use the delay assigned by the shared stagger coordinator.
+        coordinator.register((delay) => {
+          if (!active) return;
+
+          void controls.start("visible", {
+            duration,
+            ease: "easeOut",
+            delay: delay + initialDelay
+          });
         });
       } else {
-        setVisible(true);
+        // Standalone items animate without a stagger delay.
+        void controls.start("visible", {
+          duration,
+          ease: "easeOut"
+        });
       }
     } else {
-      setVisible(false);
-      setDelay(0);
+      // Reset the animation when the item leaves the viewport.
+      void controls.start("hidden", { duration });
     }
 
     return () => {
-      isMounted = false;
+      // Ignore outdated stagger callbacks and stop pending animations.
+      active = false;
+      controls.stop();
     };
-  }, [isInView, coordinator, initialDelay]);
+  }, [isInView, coordinator, initialDelay, duration, controls]);
 
   return (
     <motion.div
       ref={ref}
       variants={variants[direction]}
       initial="hidden"
-      animate={visible ? "visible" : "hidden"}
-      transition={visible ? { duration, ease: "easeOut", delay } : { duration }}
+      animate={controls}
       className={className}
     >
       {children}

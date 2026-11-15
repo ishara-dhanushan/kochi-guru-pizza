@@ -56,10 +56,14 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Settings", href: "/dashboard/settings", icon: Settings }
 ];
 
-export default function DashboardSidebar() {
+interface SidebarContentProps {
+  onNavigate: () => void;
+}
+
+// Shared sidebar content for desktop and mobile layouts.
+function SidebarContent({ onNavigate }: SidebarContentProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const visibleItems = NAV_ITEMS.filter(
     (item) => !item.adminOnly || user?.role === "admin"
@@ -70,7 +74,7 @@ export default function DashboardSidebar() {
     return pathname.startsWith(href);
   };
 
-  const SidebarContent = () => (
+  return (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100 dark:border-gray-800">
@@ -100,7 +104,7 @@ export default function DashboardSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              onClick={() => setMobileOpen(false)}
+              onClick={onNavigate}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
                 active
                   ? "bg-orange-500 text-white shadow-md shadow-orange-500/20"
@@ -168,12 +172,20 @@ export default function DashboardSidebar() {
       </div>
     </div>
   );
+}
+
+export default function DashboardSidebar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const closeMobileSidebar = () => {
+    setMobileOpen(false);
+  };
 
   return (
     <>
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-64 shrink-0 h-screen sticky top-0 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 shadow-sm">
-        <SidebarContent />
+        <SidebarContent onNavigate={closeMobileSidebar} />
       </aside>
 
       {/* Mobile top bar */}
@@ -228,7 +240,7 @@ export default function DashboardSidebar() {
                 </button>
               </div>
               <div className="flex-1 overflow-hidden">
-                <SidebarContent />
+                <SidebarContent onNavigate={closeMobileSidebar} />
               </div>
             </motion.aside>
           </>

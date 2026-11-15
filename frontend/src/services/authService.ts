@@ -8,7 +8,7 @@ import {
 import { User } from "@typings/user";
 import { AuthResponse } from "@typings/auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1";
 
 /**
  * Register a new user with email and password
@@ -51,7 +51,10 @@ export const login = async (
  * Initiate Google OAuth flow
  */
 export const loginWithGoogle = (): void => {
-  window.location.href = `${API_URL}/auth/google`;
+  window.location.href = new URL(
+    `${API_URL}/auth/google`,
+    window.location.origin
+  ).href;
 };
 
 /**
