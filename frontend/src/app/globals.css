@@ -294,6 +294,15 @@
   }
 }
 
+/* Authentication page backgrounds */
+@utility bg-auth-page-gradient {
+  @apply bg-linear-to-br from-orange-100 via-orange-50 to-white;
+
+  @variant dark {
+    @apply from-gray-900 via-black to-gray-900;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
