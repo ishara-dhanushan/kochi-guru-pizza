@@ -26,9 +26,14 @@ async function fetchMenuItems(): Promise<MenuItem[]> {
         next: { revalidate: 60 }
       }
     );
-    return data.items ?? [];
+
+    const items: MenuItem[] = data.items ?? [];
+
+    console.info(`✅ Successfully fetched ${items.length} menu items`);
+
+    return items;
   } catch (error) {
-    console.error("Failed to fetch menu items despite retries:", error);
+    console.error("❌ Failed to fetch menu items despite retries:", error);
     return [];
   }
 }

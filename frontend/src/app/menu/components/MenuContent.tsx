@@ -59,11 +59,11 @@ function MenuItemCard({ item }: { item: MenuItem }) {
       : null;
 
   return (
-    <div className="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full">
+    <div className="group bg-surface-card hover:bg-surface-card-hover rounded-2xl overflow-hidden border border-divider-card shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all flex flex-col h-full">
       {/* Image */}
       <Link
         href={`/menu/${item._id}`}
-        className="block relative h-52 bg-gray-100 dark:bg-gray-800 overflow-hidden shrink-0"
+        className="block relative h-52 bg-surface-placeholder overflow-hidden shrink-0"
       >
         {primaryImage ? (
           <Image
@@ -88,12 +88,12 @@ function MenuItemCard({ item }: { item: MenuItem }) {
         {/* Name + description */}
         <div className="flex-1">
           <Link href={`/menu/${item._id}`}>
-            <h3 className="font-heading font-bold text-gray-900 dark:text-white text-base leading-snug hover:text-orange-600 dark:hover:text-orange-400 transition-colors">
+            <h3 className="font-heading font-bold text-content-main text-base leading-snug hover:text-brand transition-colors">
               {item.name}
             </h3>
           </Link>
           {item.description && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5 leading-relaxed line-clamp-2">
+            <p className="text-sm text-content-muted mt-1.5 leading-relaxed line-clamp-2">
               {item.description}
             </p>
           )}
@@ -102,7 +102,7 @@ function MenuItemCard({ item }: { item: MenuItem }) {
         {/* Variant dropdown */}
         {hasVariants && sortedVariants.length > 0 && (
           <div>
-            <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">
+            <label className="block text-xs font-semibold text-content-subtle uppercase tracking-wide mb-1">
               Size
             </label>
             <select
@@ -112,7 +112,7 @@ function MenuItemCard({ item }: { item: MenuItem }) {
                 setSelectedVariant(v ?? null);
               }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer"
+              className="w-full border border-divider-control rounded-lg px-3 py-2 text-sm bg-surface-inset text-content-main focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-smooth cursor-pointer"
             >
               {sortedVariants.map((v) => (
                 <option key={v.size} value={v.size}>
@@ -125,17 +125,17 @@ function MenuItemCard({ item }: { item: MenuItem }) {
         )}
 
         {/* Price row */}
-        <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between pt-1 border-t border-divider-subtle">
           {displayPrice ? (
-            <span className="text-base font-extrabold text-orange-600 dark:text-orange-400">
+            <span className="text-base font-extrabold text-brand">
               {displayPrice}
             </span>
           ) : (
-            <span className="text-sm text-gray-400">—</span>
+            <span className="text-sm text-content-muted">—</span>
           )}
           <Link
             href={`/menu/${item._id}`}
-            className="flex items-center gap-0.5 text-xs font-semibold text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+            className="flex items-center gap-0.5 text-xs font-semibold text-content-muted hover:text-brand transition-colors"
           >
             View details <ChevronRight size={13} />
           </Link>
@@ -186,15 +186,15 @@ export default function MenuContent({ grouped }: MenuContentProps) {
 
   if (availableCategories.length === 0) {
     return (
-      <section className="py-24 bg-gray-50 dark:bg-gray-950">
+      <section className="py-32 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="w-20 h-20 rounded-2xl bg-orange-50 dark:bg-orange-900/10 flex items-center justify-center mx-auto mb-6">
-            <UtensilsCrossed className="w-9 h-9 text-orange-400" />
+          <div className="w-20 h-20 rounded-2xl bg-brand-wash dark:bg-brand-wash/25 flex items-center justify-center mx-auto mb-6">
+            <UtensilsCrossed className="w-9 h-9 text-brand-muted" />
           </div>
-          <h2 className="font-heading text-2xl font-bold text-gray-900 dark:text-white mb-3">
+          <h2 className="font-heading text-2xl font-bold text-content-main mb-3">
             Menu coming soon
           </h2>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-content-muted">
             We&apos;re still setting things up. Check back shortly!
           </p>
         </div>
@@ -203,29 +203,29 @@ export default function MenuContent({ grouped }: MenuContentProps) {
   }
 
   return (
-    <section className="py-10 md:py-14 bg-gray-50 dark:bg-gray-950 transition-colors duration-300 min-h-screen">
+    <section className="py-10 md:py-14 bg-surface transition-colors min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Search bar */}
         <div className="relative max-w-md mx-auto mb-8">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
           <input
             type="text"
             placeholder="Search menu items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 shadow-sm"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-divider-control bg-surface-inset text-sm text-content-main placeholder-content-muted hover:ring-2 hover:ring-brand/40 focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition-smooth shadow-sm"
           />
         </div>
 
         {/* Sticky category filter tabs */}
-        <div className="sticky top-0 z-20 bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur-sm pt-2 pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 mb-10">
+        <div className="sticky top-0 z-20 bg-surface/75 backdrop-blur-sm py-4 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 mb-10">
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             <button
               onClick={() => setActiveCategory("all")}
-              className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 border ${
+              className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-smooth border ${
                 activeCategory === "all"
-                  ? "bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20"
-                  : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-orange-400 hover:text-orange-600 dark:hover:text-orange-400"
+                  ? "bg-brand text-brand-on border-brand shadow-md shadow-brand/20"
+                  : "bg-surface-card text-content-muted border-divider-control hover:border-brand hover:text-brand"
               }`}
             >
               All Items
@@ -236,10 +236,10 @@ export default function MenuContent({ grouped }: MenuContentProps) {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 border ${
+                  className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-smooth border ${
                     activeCategory === cat
-                      ? "bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-500/20"
-                      : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-orange-400 hover:text-orange-600 dark:hover:text-orange-400"
+                      ? "bg-brand text-brand-on border-brand shadow-md shadow-brand/20"
+                      : "bg-surface-card text-content-muted border-divider-control hover:border-brand hover:text-brand"
                   }`}
                 >
                   <span>{CATEGORY_ICONS[cat]}</span>
@@ -247,8 +247,8 @@ export default function MenuContent({ grouped }: MenuContentProps) {
                   <span
                     className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
                       activeCategory === cat
-                        ? "bg-white/20 text-white"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                        ? "bg-white/20 text-brand-on"
+                        : "bg-surface-soft text-content-muted"
                     }`}
                   >
                     {count}
@@ -268,9 +268,9 @@ export default function MenuContent({ grouped }: MenuContentProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-center py-20 text-gray-400"
+                className="text-center py-20 text-content-muted"
               >
-                <p className="text-5xl mb-4">🔍</p>
+                <Search className="w-12 h-12 mx-auto mb-4 text-content-muted" />
                 <p className="font-semibold text-lg">No items found</p>
                 <p className="text-sm mt-1">Try a different search term</p>
               </motion.div>
@@ -287,12 +287,12 @@ export default function MenuContent({ grouped }: MenuContentProps) {
                   <ScrollAnimatedItem className="flex items-center gap-4 mb-6">
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{CATEGORY_ICONS[cat]}</span>
-                      <h2 className="font-heading text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                      <h2 className="font-heading text-2xl md:text-3xl font-bold text-content-main">
                         {CATEGORY_LABELS[cat]}
                       </h2>
                     </div>
-                    <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800" />
-                    <span className="text-sm text-gray-400 font-medium shrink-0">
+                    <div className="flex-1 h-px bg-divider-standard" />
+                    <span className="text-sm text-content-muted font-medium shrink-0">
                       {filteredCategoryMap.get(cat)?.length ?? 0}{" "}
                       {(filteredCategoryMap.get(cat)?.length ?? 0) === 1
                         ? "item"
