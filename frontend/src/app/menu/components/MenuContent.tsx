@@ -15,23 +15,11 @@ import {
 import { UtensilsCrossed, Search, ChevronRight } from "lucide-react";
 import ScrollAnimatedList from "@components/ScrollAnimatedList";
 import ScrollAnimatedItem from "@components/ScrollAnimatedItem";
+import MenuCategoryIcon from "@components/MenuCategoryIcon";
 
 interface MenuContentProps {
   grouped: Partial<Record<MenuCategory, MenuItem[]>>;
 }
-
-const CATEGORY_ICONS: Record<MenuCategory, string> = {
-  pizza: "🍕",
-  pasta: "🍝",
-  bun: "🍔",
-  sandwich: "🥪",
-  snack: "🍟",
-  fresh_juice: "🥤",
-  milkshake: "🥛",
-  mojito: "🍹",
-  soft_drinks: "🧃",
-  add_on: "✨"
-};
 
 function MenuItemCard({ item }: { item: MenuItem }) {
   const hasVariants = item.variants && item.variants.length > 0;
@@ -63,6 +51,7 @@ function MenuItemCard({ item }: { item: MenuItem }) {
       {/* Image */}
       <Link
         href={`/menu/${item._id}`}
+        aria-label={item.name}
         className="block relative h-52 bg-surface-placeholder overflow-hidden shrink-0"
       >
         {primaryImage ? (
@@ -76,9 +65,10 @@ function MenuItemCard({ item }: { item: MenuItem }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-6xl opacity-20">
-              {CATEGORY_ICONS[item.category]}
-            </span>
+            <MenuCategoryIcon
+              category={item.category}
+              className="size-16 text-content-main opacity-20"
+            />
           </div>
         )}
       </Link>
@@ -242,7 +232,10 @@ export default function MenuContent({ grouped }: MenuContentProps) {
                       : "bg-surface-card text-content-muted border-divider-control hover:border-brand hover:text-brand"
                   }`}
                 >
-                  <span>{CATEGORY_ICONS[cat]}</span>
+                  <MenuCategoryIcon
+                    category={cat}
+                    className="size-4 shrink-0"
+                  />
                   {CATEGORY_LABELS[cat]}
                   <span
                     className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
@@ -286,7 +279,10 @@ export default function MenuContent({ grouped }: MenuContentProps) {
                   {/* Category heading */}
                   <ScrollAnimatedItem className="flex items-center gap-4 mb-6">
                     <div className="flex items-center gap-3">
-                      <span className="text-3xl">{CATEGORY_ICONS[cat]}</span>
+                      <MenuCategoryIcon
+                        category={cat}
+                        className="size-8 text-brand shrink-0"
+                      />
                       <h2 className="font-heading text-2xl md:text-3xl font-bold text-content-main">
                         {CATEGORY_LABELS[cat]}
                       </h2>

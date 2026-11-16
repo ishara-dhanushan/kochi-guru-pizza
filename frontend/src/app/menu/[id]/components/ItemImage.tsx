@@ -7,19 +7,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MenuCategory } from "@typings/menu";
-
-const CATEGORY_ICONS: Record<string, string> = {
-  pizza: "🍕",
-  pasta: "🍝",
-  bun: "🍔",
-  sandwich: "🥪",
-  snack: "🍟",
-  fresh_juice: "🥤",
-  milkshake: "🥛",
-  mojito: "🍹",
-  soft_drinks: "🧃",
-  add_on: "✨"
-};
+import MenuCategoryIcon from "@components/MenuCategoryIcon";
 
 interface ItemImageProps {
   images: string[];
@@ -85,7 +73,10 @@ export default function ItemImage({ images, alt, category }: ItemImageProps) {
   if (images.length === 0) {
     return (
       <div className="flex h-85 w-full flex-col items-center justify-center gap-3 sm:h-100 lg:h-115">
-        <span className="text-8xl opacity-20">{CATEGORY_ICONS[category]}</span>
+        <MenuCategoryIcon
+          category={category}
+          className="size-24 text-content-main opacity-20"
+        />
 
         <span className="text-xs font-medium tracking-widest text-content-muted uppercase">
           No image available

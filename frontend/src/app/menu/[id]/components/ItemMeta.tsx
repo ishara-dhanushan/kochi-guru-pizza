@@ -1,18 +1,6 @@
 // src/app/menu/[id]/components/ItemMeta.tsx
 import { MenuItem, CATEGORY_LABELS } from "@typings/menu";
-
-const CATEGORY_ICONS: Record<string, string> = {
-  pizza: "🍕",
-  pasta: "🍝",
-  bun: "🍔",
-  sandwich: "🥪",
-  snack: "🍟",
-  fresh_juice: "🥤",
-  milkshake: "🥛",
-  mojito: "🍹",
-  soft_drinks: "🧃",
-  add_on: "✨"
-};
+import MenuCategoryIcon from "@components/MenuCategoryIcon";
 
 interface ItemMetaProps {
   item: MenuItem;
@@ -24,7 +12,10 @@ export default function ItemMeta({ item }: ItemMetaProps) {
       {/* Category + availability row */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-brand/10 text-brand">
-          <span>{CATEGORY_ICONS[item.category]}</span>
+          <MenuCategoryIcon
+            category={item.category}
+            className="size-3.5 shrink-0"
+          />
           {CATEGORY_LABELS[item.category]}
         </span>
         <span
