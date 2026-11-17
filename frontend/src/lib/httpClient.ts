@@ -7,6 +7,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1";
 const ACCESS_TOKEN_KEY = "kochi_access_token";
 const REFRESH_TOKEN_KEY = "kochi_refresh_token";
 
+// Share a single refresh request between concurrent HTTP requests.
+let refreshPromise: Promise<string> | null = null;
+
 const publicRoutes = ["/", "/menu", "/about", "/contact"];
 
 const isPublicRoute = (pathname: string) => {
@@ -113,100 +116,135 @@ export const httpClient = async <T>(
 
         if (refreshToken) {
           try {
-            // Try to refresh the access token
-            const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({ refreshToken })
+            // Create a refresh request only if one is not already running.
+            if (!refreshPromise) {
+              refreshPromise = (async () => {
+                try {
+                  // Try to refresh the access token
+                  const refreshResponse = await fetch(
+                    `${API_URL}/auth/refresh`,
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify({ refreshToken })
+                    }
+                  );
+
+                  if (refreshResponse.ok) {
+                    const {
+                      accessToken: newAccessToken,
+                      refreshToken: newRefreshToken
+                    } = await refreshResponse.json();
+
+                    setTokens(newAccessToken, newRefreshToken);
+
+                    return newAccessToken;
+                  } else {
+                    // Only force logout if the backend explicitly tells us the token is invalid (400, 401)
+                    if ([400, 401].includes(refreshResponse.status)) {
+                      clearTokens();
+
+                      if (
+                        typeof window !== "undefined" &&
+                        !isPublicRoute(window.location.pathname)
+                      ) {
+                        window.location.href = new URL(
+                          "/login",
+                          window.location.origin
+                        ).href;
+                      }
+
+                      throw new ApiError(
+                        "Session expired. Please login again.",
+                        refreshResponse.status
+                      );
+                    }
+
+                    throw new ApiError(
+                      `HTTP error! status: ${refreshResponse.status}`,
+                      refreshResponse.status
+                    );
+                  }
+                } finally {
+                  // Reset the refresh Promise.
+                  refreshPromise = null;
+                }
+              })();
+            }
+
+            // Wait for the shared refresh request.
+            const newAccessToken = await refreshPromise;
+
+            // Retry original request with new token
+            headers.set("Authorization", `Bearer ${newAccessToken}`);
+
+            const retryResponse = await fetch(url, {
+              ...options,
+              headers
             });
 
-            if (refreshResponse.ok) {
-              const {
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken
-              } = await refreshResponse.json();
-              setTokens(newAccessToken, newRefreshToken);
-
-              // Retry original request with new token
-              headers.set("Authorization", `Bearer ${newAccessToken}`);
-              const retryResponse = await fetch(url, {
-                ...options,
-                headers
-              });
-
-              if (!retryResponse.ok) {
-                if (retryResponse.status === 401) {
-                  clearTokens();
-                  if (
-                    typeof window !== "undefined" &&
-                    !isPublicRoute(window.location.pathname)
-                  ) {
-                    window.location.href = "/login";
-                  }
-                  throw new ApiError(
-                    "Session expired. Please login again.",
-                    401
-                  );
-                }
-
-                let errorData;
-                try {
-                  errorData = await retryResponse.json();
-                } catch {
-                  errorData = { error: "Unknown error" };
-                }
-
-                throw new ApiError(
-                  errorData.error ||
-                    `HTTP error! status: ${retryResponse.status}`,
-                  retryResponse.status,
-                  errorData.details
-                );
-              }
-
-              try {
-                return await retryResponse.json();
-              } catch {
-                throw new Error("Failed to parse JSON response");
-              }
-            } else {
-              // Only force logout if the backend explicitly tells us the token is invalid (400, 401)
-              if ([400, 401].includes(refreshResponse.status)) {
+            if (!retryResponse.ok) {
+              if (retryResponse.status === 401) {
                 clearTokens();
+
                 if (
                   typeof window !== "undefined" &&
                   !isPublicRoute(window.location.pathname)
                 ) {
-                  window.location.href = "/login";
+                  window.location.href = new URL(
+                    "/login",
+                    window.location.origin
+                  ).href;
                 }
-                throw new ApiError(
-                  "Session expired. Please login again.",
-                  refreshResponse.status
-                );
+
+                throw new ApiError("Session expired. Please login again.", 401);
               }
+
+              let errorData;
+
+              try {
+                errorData = await retryResponse.json();
+              } catch {
+                errorData = { error: "Unknown error" };
+              }
+
               throw new ApiError(
-                `HTTP error! status: ${refreshResponse.status}`,
-                refreshResponse.status
+                errorData.error ||
+                  `HTTP error! status: ${retryResponse.status}`,
+                retryResponse.status,
+                errorData.details
               );
+            }
+
+            try {
+              return await retryResponse.json();
+            } catch {
+              throw new Error("Failed to parse JSON response");
             }
           } catch (error: unknown) {
             // Network errors or other exceptions. Do not force logout.
             if (error instanceof Error) {
               throw error;
             }
+
             throw new Error(String(error));
           }
         } else {
           // No refresh token, clear tokens
           clearTokens();
+
           if (
             typeof window !== "undefined" &&
             !isPublicRoute(window.location.pathname)
           ) {
-            window.location.href = "/login";
+            window.location.href = new URL(
+              "/login",
+              window.location.origin
+            ).href;
           }
+
           throw new Error("Unauthorized");
         }
       }

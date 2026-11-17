@@ -4,6 +4,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Pizza, ArrowRight } from "lucide-react";
 
 type PromotionSlide = {
   imageUrl: string;
@@ -51,11 +52,11 @@ const promotionSlides: PromotionSlide[] = [
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16">
-      <span className="text-5xl">🍕</span>
-      <p className="font-heading text-gray-700 dark:text-gray-300 text-base text-center">
+      <Pizza className="size-12 text-brand" aria-hidden="true" />
+      <p className="font-heading text-content-subtle text-base text-center">
         No active offers right now
       </p>
-      <p className="font-mono text-gray-400 dark:text-gray-500 text-xs text-center tracking-wider">
+      <p className="font-mono text-content-faint text-xs text-center tracking-wider">
         Check back soon — deals drop every week
       </p>
     </div>
@@ -89,33 +90,33 @@ function OfferCard({ slide }: { slide: PromotionSlide }) {
           <div className="w-full px-6 sm:px-10 md:px-14 lg:px-20 py-6 md:py-10">
             {/* Top chips row */}
             <div className="flex items-center gap-3 mb-4 md:mb-6">
-              <span className="font-mono text-[0.6rem] font-black tracking-[0.18em] px-3 py-1 rounded bg-orange-600 text-white">
+              <span className="font-mono text-[0.6rem] font-black tracking-[0.18em] px-3 py-1 rounded bg-brand text-brand-on">
                 {slide.badge}
               </span>
-              <span className="font-mono text-[0.65rem] font-semibold tracking-wider uppercase text-orange-600">
+              <span className="font-mono text-[0.65rem] font-semibold tracking-wider uppercase text-brand">
                 {slide.tag}
               </span>
             </div>
 
             {/* Title */}
-            <h3 className="font-heading text-gray-900 dark:text-white text-2xl sm:text-3xl md:text-4xl font-bold leading-tight mb-3">
+            <h3 className="font-heading text-content-main text-2xl sm:text-3xl md:text-4xl font-bold leading-tight mb-3">
               {slide.title}
             </h3>
 
             {/* Subtitle */}
-            <p className="text-gray-600 dark:text-gray-400 text-sm md:text-[0.95rem] leading-relaxed mb-4 md:mb-7 max-w-120">
+            <p className="text-content-muted text-sm md:text-[0.95rem] leading-relaxed mb-4 md:mb-7 max-w-120">
               {slide.subtitle}
             </p>
 
             {/* Discount */}
-            <div className="font-heading text-4xl md:text-5xl font-extrabold leading-none text-orange-600 mb-3 md:mb-4">
+            <div className="font-heading text-4xl md:text-5xl font-extrabold leading-none text-brand mb-3 md:mb-4">
               {slide.discount}
             </div>
 
             {/* Expiry */}
             <div className="flex items-center gap-2 mb-5 md:mb-8">
-              <span className="inline-block w-2 h-2 rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.9)]" />
-              <span className="font-mono text-[0.75rem] text-gray-500 dark:text-gray-400 tracking-wider">
+              <span className="inline-block w-2 h-2 rounded-full bg-success shadow-[0_0_6px_var(--success)] shadow-success/90" />
+              <span className="font-mono text-[0.75rem] text-content-muted tracking-wider">
                 Expires: {slide.expires}
               </span>
             </div>
@@ -123,9 +124,10 @@ function OfferCard({ slide }: { slide: PromotionSlide }) {
             {/* Button */}
             <a
               href="tel:0770776848"
-              className="inline-flex items-center gap-2 w-fit px-6 md:px-7 py-2.5 md:py-3 rounded-lg font-bold text-[0.9rem] tracking-wider transition-colors duration-200 bg-orange-600 hover:bg-orange-700 text-white"
+              className="inline-flex items-center gap-2 w-fit px-6 md:px-7 py-2.5 md:py-3 rounded-lg font-bold text-[0.9rem] tracking-wider transition-colors bg-brand hover:bg-brand-hover text-brand-on"
             >
-              ORDER NOW →
+              ORDER NOW
+              <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -218,7 +220,7 @@ export default function PromotionsSection() {
   const activeSlide = slides[visible];
 
   return (
-    <section className="py-20 md:py-24 bg-white dark:bg-gray-950 transition-colors duration-300">
+    <section className="py-20 md:py-24 bg-surface transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -227,10 +229,10 @@ export default function PromotionsSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12 gpu-fix"
         >
-          <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-4">
             Special Offers
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6">
+          <p className="text-lg text-content-muted max-w-2xl mx-auto mb-6">
             Don&apos;t miss out on our exclusive deals and limited-time
             promotions
           </p>
@@ -238,7 +240,7 @@ export default function PromotionsSection() {
 
         {/* MAIN CARD */}
         <motion.div
-          className="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-smooth duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 gpu-fix"
+          className="group bg-surface-card rounded-xl shadow-md hover:shadow-xl transition-smooth overflow-hidden border border-divider-card gpu-fix"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.2 }}
@@ -253,7 +255,7 @@ export default function PromotionsSection() {
             }}
           >
             {/* Inner div — measured by ResizeObserver */}
-            <div ref={contentRef} className="w-full md:min-h-[450px]">
+            <div ref={contentRef} className="w-full md:min-h-112.5">
               {slides.length === 0 || !activeSlide ? (
                 <EmptyState />
               ) : (
@@ -278,10 +280,10 @@ export default function PromotionsSection() {
                   key={i}
                   onClick={() => handleClick(i)}
                   aria-label={`Go to offer ${i + 1}`}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                  className={`h-1.5 rounded-full transition-all ${
                     active === i
-                      ? "bg-orange-600 w-6"
-                      : "bg-gray-300 dark:bg-gray-600 w-1.5 hover:bg-orange-400"
+                      ? "bg-brand w-6"
+                      : "bg-indicator-inactive w-1.5 hover:bg-brand-subtle"
                   }`}
                 />
               ))}

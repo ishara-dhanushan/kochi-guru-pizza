@@ -4,10 +4,11 @@
 import React, {
   createContext,
   useContext,
-  useEffect,
+  useLayoutEffect,
   useState,
   useMemo,
-  useCallback
+  useCallback,
+  useSyncExternalStore
 } from "react";
 
 type ThemeMode = "light" | "dark" | "system";
@@ -21,67 +22,65 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Listen for system theme changes.
+const subscribe = (callback: () => void) => {
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+  mediaQuery.addEventListener("change", callback);
+
+  return () => mediaQuery.removeEventListener("change", callback);
+};
+
+// Get the saved theme preference.
+const getStoredTheme = (): ThemeMode => {
+  const storedTheme = localStorage.getItem("theme");
+
+  return storedTheme === "light" || storedTheme === "dark"
+    ? storedTheme
+    : "system";
+};
+
+// Get the current system theme.
+const getSystemTheme = (): ResolvedTheme => {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+};
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeMode>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
+  const [selectedTheme, setThemeState] = useState<ThemeMode | null>(null);
 
-  const getSystemTheme = useCallback((): ResolvedTheme => {
-    if (typeof window === "undefined") return "light";
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+  const snapshot = useSyncExternalStore(
+    subscribe,
+    () => {
+      const theme = selectedTheme ?? getStoredTheme();
+
+      return theme === "system"
+        ? (`system-${getSystemTheme()}` as const)
+        : theme;
+    },
+    () => "system-light" as const
+  );
+
+  const theme: ThemeMode =
+    snapshot === "light" || snapshot === "dark" ? snapshot : "system";
+
+  const resolvedTheme: ResolvedTheme =
+    snapshot === "dark" || snapshot === "system-dark" ? "dark" : "light";
+
+  // Apply dark class to HTML element before the browser repaints.
+  useLayoutEffect(() => {
+    const storedTheme = selectedTheme ?? getStoredTheme();
+    const actualTheme =
+      storedTheme === "system" ? getSystemTheme() : storedTheme;
+
+    document.documentElement.classList.toggle("dark", actualTheme === "dark");
+  }, [selectedTheme, resolvedTheme]);
+
+  const setTheme = useCallback((newTheme: ThemeMode) => {
+    localStorage.setItem("theme", newTheme);
+    setThemeState(newTheme);
   }, []);
-
-  const resolveTheme = useCallback(
-    (themeMode: ThemeMode): ResolvedTheme => {
-      if (themeMode === "system") {
-        return getSystemTheme();
-      }
-      return themeMode;
-    },
-    [getSystemTheme]
-  );
-
-  // Initialize theme from localStorage on mount
-  useEffect(() => {
-    const storedTheme = localStorage.getItem("theme") as ThemeMode | null;
-    const selectedTheme = storedTheme || "system";
-    setThemeState(selectedTheme);
-    setResolvedTheme(resolveTheme(selectedTheme));
-  }, [resolveTheme]);
-
-  // Apply dark class to HTML element when resolvedTheme changes
-  useEffect(() => {
-    const root = document.documentElement;
-    if (resolvedTheme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [resolvedTheme]);
-
-  // Listen for system theme changes when in system mode
-  useEffect(() => {
-    if (theme !== "system") return;
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      setResolvedTheme(getSystemTheme());
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme, getSystemTheme]);
-
-  const setTheme = useCallback(
-    (newTheme: ThemeMode) => {
-      setThemeState(newTheme);
-      const resolved = newTheme === "system" ? getSystemTheme() : newTheme;
-      setResolvedTheme(resolved);
-      localStorage.setItem("theme", newTheme);
-    },
-    [getSystemTheme]
-  );
 
   const value = useMemo(
     () => ({ theme, resolvedTheme, setTheme }),
@@ -95,8 +94,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext);
+
   if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
+
   return context;
 }

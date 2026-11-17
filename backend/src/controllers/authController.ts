@@ -38,6 +38,60 @@ const generateRefreshToken = (userId: string): string => {
 };
 
 /**
+ * Atomically store or rotate a refresh token while enforcing
+ * the maximum active sessions limit.
+ */
+const storeRefreshToken = async (
+  userId: string,
+  newRefreshToken: string,
+  oldRefreshToken?: string
+): Promise<boolean> => {
+  // Remove the old token during rotation and avoid duplicate tokens.
+  const tokensToRemove = oldRefreshToken
+    ? [oldRefreshToken, newRefreshToken]
+    : [newRefreshToken];
+
+  const result = await User.updateOne(
+    {
+      _id: userId,
+      ...(oldRefreshToken ? { refreshTokens: oldRefreshToken } : {})
+    },
+    [
+      {
+        $set: {
+          refreshTokens: {
+            $slice: [
+              {
+                $concatArrays: [
+                  {
+                    $filter: {
+                      input: { $ifNull: ["$refreshTokens", []] },
+                      as: "token",
+                      cond: {
+                        $not: [
+                          {
+                            $in: ["$$token", tokensToRemove]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  [newRefreshToken]
+                ]
+              },
+              -config.MAX_ACTIVE_SESSIONS
+            ]
+          }
+        }
+      }
+    ],
+    { updatePipeline: true }
+  );
+
+  return result.matchedCount > 0;
+};
+
+/**
  * Register a new user with email and password
  */
 export const register = async (req: Request, res: Response) => {
@@ -68,17 +122,15 @@ export const register = async (req: Request, res: Response) => {
     const accessToken = generateAccessToken(user._id.toString());
     const refreshToken = generateRefreshToken(user._id.toString());
 
-    // Store refresh token in database
-    user.refreshTokens.push(refreshToken);
+    // Store refresh token in database and enforce max sessions limit.
+    const tokenStored = await storeRefreshToken(
+      user._id.toString(),
+      refreshToken
+    );
 
-    // Enforce max sessions limit
-    if (user.refreshTokens.length > config.MAX_ACTIVE_SESSIONS) {
-      user.refreshTokens = user.refreshTokens.slice(
-        -config.MAX_ACTIVE_SESSIONS
-      );
+    if (!tokenStored) {
+      throw new Error("User not found while storing refresh token");
     }
-
-    await user.save();
 
     // Return user without password
     const userResponse: Partial<IUser> = user.toObject();
@@ -126,17 +178,15 @@ export const login = async (req: Request, res: Response) => {
     const accessToken = generateAccessToken(user._id.toString());
     const refreshToken = generateRefreshToken(user._id.toString());
 
-    // Store refresh token in database
-    user.refreshTokens.push(refreshToken);
+    // Store refresh token in database and enforce max sessions limit.
+    const tokenStored = await storeRefreshToken(
+      user._id.toString(),
+      refreshToken
+    );
 
-    // Enforce max sessions limit
-    if (user.refreshTokens.length > config.MAX_ACTIVE_SESSIONS) {
-      user.refreshTokens = user.refreshTokens.slice(
-        -config.MAX_ACTIVE_SESSIONS
-      );
+    if (!tokenStored) {
+      throw new Error("User not found while storing refresh token");
     }
-
-    await user.save();
 
     // Return user without password
     const userResponse: Partial<IUser> = user.toObject();
@@ -171,32 +221,42 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
       config.REFRESH_TOKEN_SECRET as string
     ) as { id: string };
 
-    // Find user
-    const user = await User.findById(decoded.id);
+    // Generate new tokens
+    const newAccessToken = generateAccessToken(decoded.id);
+    const newRefreshToken = generateRefreshToken(decoded.id);
 
-    // Check if user exists and if the token is in the allowed list
-    if (!user || !user.refreshTokens.includes(refreshToken)) {
-      return res.status(401).json({ error: "Invalid refresh token" });
+    // Rotate the refresh token atomically
+    const tokenRotated = await storeRefreshToken(
+      decoded.id,
+      newRefreshToken,
+      refreshToken
+    );
+
+    // Reject invalid or revoked refresh tokens
+    if (!tokenRotated) {
+      return res.status(401).json({
+        error: "Invalid refresh token"
+      });
     }
-
-    // Generate NEW tokens (Rotate)
-    const newAccessToken = generateAccessToken(user._id.toString());
-    const newRefreshToken = generateRefreshToken(user._id.toString());
-
-    // Replace old refresh token with new one
-    // We filter out the old one and push the new one to handle the rotation securely
-    user.refreshTokens = user.refreshTokens.filter((rt) => rt !== refreshToken);
-    user.refreshTokens.push(newRefreshToken);
-
-    await user.save();
 
     res.status(200).json({
       accessToken: newAccessToken,
       refreshToken: newRefreshToken
     });
   } catch (error) {
+    // Handle JWT verification errors
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({
+        error: "Invalid or expired refresh token"
+      });
+    }
+
+    // Handle unexpected server errors
     console.error("Refresh token error:", error);
-    res.status(401).json({ error: "Invalid or expired refresh token" });
+
+    res.status(500).json({
+      error: "Server error during token refresh"
+    });
   }
 };
 
@@ -242,17 +302,15 @@ export const googleCallback = async (req: Request, res: Response) => {
     const accessToken = generateAccessToken(user._id.toString());
     const refreshToken = generateRefreshToken(user._id.toString());
 
-    // Store refresh token in database
-    user.refreshTokens.push(refreshToken);
+    // Store refresh token in database and enforce max sessions limit.
+    const tokenStored = await storeRefreshToken(
+      user._id.toString(),
+      refreshToken
+    );
 
-    // Enforce max sessions limit
-    if (user.refreshTokens.length > config.MAX_ACTIVE_SESSIONS) {
-      user.refreshTokens = user.refreshTokens.slice(
-        -config.MAX_ACTIVE_SESSIONS
-      );
+    if (!tokenStored) {
+      throw new Error("User not found while storing refresh token");
     }
-
-    await user.save();
 
     // Redirect to frontend with tokens
     res.redirect(

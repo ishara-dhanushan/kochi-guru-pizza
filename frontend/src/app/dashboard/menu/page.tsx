@@ -36,23 +36,49 @@ export default function MenuManagementPage() {
   >("all");
   const [deletingItem, setDeletingItem] = useState<MenuItem | null>(null);
 
-  const fetchItems = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
-    else setRefreshing(true);
-    try {
-      const data = await menuService.getMenuItems();
-      setItems(data);
-    } catch {
-      toast.error("Failed to load menu items");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  // Fetch menu items and ignore responses from obsolete requests.
+  const fetchItems = useCallback(
+    (shouldIgnore: () => boolean = () => false) => {
+      return menuService
+        .getMenuItems()
+        .then((data) => {
+          if (!shouldIgnore()) {
+            setItems(data);
+          }
+        })
+        .catch(() => {
+          if (!shouldIgnore()) {
+            toast.error("Failed to load menu items");
+          }
+        })
+        .finally(() => {
+          if (!shouldIgnore()) {
+            setLoading(false);
+            setRefreshing(false);
+          }
+        });
+    },
+    []
+  );
 
+  // Load menu items when the page mounts.
   useEffect(() => {
-    fetchItems();
+    let ignore = false;
+
+    void fetchItems(() => ignore);
+
+    return () => {
+      ignore = true;
+    };
   }, [fetchItems]);
+
+  // Refresh the list without replacing it with the initial loading screen.
+  const handleRefresh = async () => {
+    if (loading || refreshing) return;
+
+    setRefreshing(true);
+    await fetchItems();
+  };
 
   const handleDelete = async () => {
     if (!deletingItem) return;
@@ -116,24 +142,24 @@ export default function MenuManagementPage() {
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
       >
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-content-main">
             Menu Management
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-content-muted mt-1">
             {totalItems} items · {availableCount} available
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => fetchItems(true)}
-            disabled={refreshing}
-            className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-orange-500 hover:border-orange-300 dark:hover:border-orange-700 transition-all duration-200 disabled:opacity-60"
+            onClick={handleRefresh}
+            disabled={loading || refreshing}
+            className="p-2.5 rounded-xl border border-divider-control text-content-muted enabled:hover:text-brand enabled:hover:border-brand/60 transition-all disabled:opacity-60"
           >
             <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
           </button>
           <button
             onClick={() => router.push("/dashboard/menu/new")}
-            className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-orange-600 to-orange-500 text-white rounded-xl font-semibold text-sm hover:from-orange-700 hover:to-orange-600 shadow-lg shadow-orange-500/20 transition-all duration-200"
+            className="flex items-center gap-2 px-4 py-2.5 bg-brand-btn text-brand-on rounded-xl font-semibold text-sm hover:bg-brand-btn-hover shadow-lg shadow-brand/20 hover:shadow-brand/50 transition-all"
           >
             <Plus size={16} />
             Add Item
@@ -150,14 +176,14 @@ export default function MenuManagementPage() {
         <div className="relative flex-1">
           <Search
             size={15}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted"
           />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search items..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
+            className="w-full pl-10 pr-4 py-2.5 bg-surface-card border border-divider-control rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-smooth text-content-main placeholder-content-muted"
           />
         </div>
         <select
@@ -165,7 +191,7 @@ export default function MenuManagementPage() {
           onChange={(e) =>
             setFilterCategory(e.target.value as MenuCategory | "all")
           }
-          className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all duration-200 text-gray-700 dark:text-gray-300"
+          className="px-4 py-2.5 bg-surface-card border border-divider-control rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-smooth text-content-subtle"
         >
           <option value="all">All Categories</option>
           {CATEGORIES.map((cat) => (
@@ -179,7 +205,7 @@ export default function MenuManagementPage() {
           onChange={(e) =>
             setFilterAvailability(e.target.value as typeof filterAvailability)
           }
-          className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all duration-200 text-gray-700 dark:text-gray-300"
+          className="px-4 py-2.5 bg-surface-card border border-divider-control rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-smooth text-content-subtle"
         >
           <option value="all">All Status</option>
           <option value="available">Available</option>
@@ -189,8 +215,8 @@ export default function MenuManagementPage() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-3">
-          <Loader2 size={32} className="animate-spin text-orange-500" />
-          <p className="text-sm text-gray-400">Loading menu items...</p>
+          <Loader2 size={32} className="animate-spin text-brand" />
+          <p className="text-sm text-content-muted">Loading menu items...</p>
         </div>
       ) : Object.keys(grouped).length === 0 ? (
         <motion.div
@@ -198,18 +224,18 @@ export default function MenuManagementPage() {
           animate={{ opacity: 1 }}
           className="flex flex-col items-center justify-center py-24 gap-4"
         >
-          <div className="w-16 h-16 rounded-2xl bg-orange-50 dark:bg-orange-900/10 flex items-center justify-center">
-            <UtensilsCrossed size={28} className="text-orange-400" />
+          <div className="w-16 h-16 rounded-2xl bg-brand-wash dark:bg-brand-wash/25 flex items-center justify-center">
+            <UtensilsCrossed size={28} className="text-brand" />
           </div>
           <div className="text-center">
-            <p className="font-semibold text-gray-700 dark:text-gray-300">
+            <p className="font-semibold text-content-subtle">
               {search ||
               filterCategory !== "all" ||
               filterAvailability !== "all"
                 ? "No items match your filters"
                 : "No menu items yet"}
             </p>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-content-muted mt-1">
               {search ||
               filterCategory !== "all" ||
               filterAvailability !== "all"
@@ -222,7 +248,7 @@ export default function MenuManagementPage() {
             filterAvailability === "all" && (
               <button
                 onClick={() => router.push("/dashboard/menu/new")}
-                className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-semibold text-sm transition-all duration-200"
+                className="flex items-center gap-2 px-4 py-2.5 bg-brand hover:bg-brand-hover text-brand-on rounded-xl font-semibold text-sm transition-all"
               >
                 <Plus size={16} />
                 Add First Item
@@ -239,13 +265,13 @@ export default function MenuManagementPage() {
               transition={{ delay: catIdx * 0.05 }}
             >
               <div className="flex items-center gap-3 mb-3">
-                <h2 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                <h2 className="text-sm font-bold text-content-main uppercase tracking-wider">
                   {CATEGORY_LABELS[cat]}
                 </h2>
-                <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-surface-inset text-content-muted px-2 py-0.5 rounded-full font-medium">
                   {grouped[cat].length}
                 </span>
-                <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
+                <div className="flex-1 h-px bg-divider-subtle" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                 <AnimatePresence>
@@ -264,13 +290,17 @@ export default function MenuManagementPage() {
         </div>
       )}
 
-      {deletingItem && (
-        <DeleteConfirmModal
-          item={deletingItem}
-          onConfirm={handleDelete}
-          onClose={() => setDeletingItem(null)}
-        />
-      )}
+      {/* Delete Menu Item Confirmation Modal */}
+      <AnimatePresence>
+        {deletingItem && (
+          <DeleteConfirmModal
+            key={deletingItem._id}
+            item={deletingItem}
+            onConfirm={handleDelete}
+            onClose={() => setDeletingItem(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

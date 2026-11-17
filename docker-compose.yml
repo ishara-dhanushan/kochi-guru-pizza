@@ -29,7 +29,7 @@ services:
       - "3000:3000" # Map (Local Port) : (Container Port)
     # Load other environment variables from .env.local
     environment:
-      - INTERNAL_API_URL=http://backend:5000/v1
+      INTERNAL_API_URL: ${INTERNAL_API_URL}
     env_file: ./frontend/.env
     # Wait for the backend container to be created before starting the frontend
     depends_on:

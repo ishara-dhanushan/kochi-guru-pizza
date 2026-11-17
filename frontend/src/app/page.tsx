@@ -13,7 +13,7 @@ export default function Home() {
       <Header />
       <HeroSection />
       <PromotionsSection />
-      {/* <TrendingItems /> */}
+      <TrendingItems />
       <WhyChooseUs />
       <CustomerTestimonials />
       <Footer />

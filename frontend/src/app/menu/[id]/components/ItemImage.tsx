@@ -7,19 +7,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MenuCategory } from "@typings/menu";
-
-const CATEGORY_ICONS: Record<string, string> = {
-  pizza: "🍕",
-  pasta: "🍝",
-  bun: "🍔",
-  sandwich: "🥪",
-  snack: "🍟",
-  fresh_juice: "🥤",
-  milkshake: "🥛",
-  mojito: "🍹",
-  soft_drinks: "🧃",
-  add_on: "✨"
-};
+import MenuCategoryIcon from "@components/MenuCategoryIcon";
 
 interface ItemImageProps {
   images: string[];
@@ -85,9 +73,12 @@ export default function ItemImage({ images, alt, category }: ItemImageProps) {
   if (images.length === 0) {
     return (
       <div className="flex h-85 w-full flex-col items-center justify-center gap-3 sm:h-100 lg:h-115">
-        <span className="text-8xl opacity-20">{CATEGORY_ICONS[category]}</span>
+        <MenuCategoryIcon
+          category={category}
+          className="size-24 text-content-main opacity-20"
+        />
 
-        <span className="text-xs font-medium tracking-widest text-gray-400 uppercase dark:text-gray-500">
+        <span className="text-xs font-medium tracking-widest text-content-muted uppercase">
           No image available
         </span>
       </div>
@@ -127,20 +118,20 @@ export default function ItemImage({ images, alt, category }: ItemImageProps) {
             <button
               type="button"
               onClick={scrollPrev}
-              className="absolute top-1/2 left-3 z-10 -translate-y-1/2 rounded-full! bg-black/35 p-2.5 backdrop-blur-sm transition-smooth duration-300 hover:bg-black/55"
+              className="absolute top-1/2 left-3 z-10 -translate-y-1/2 rounded-full! bg-black/35 p-2.5 backdrop-blur-sm transition-smooth hover:bg-black/55"
               aria-label="Previous image"
             >
-              <ChevronLeft className="h-5 w-5 text-white" />
+              <ChevronLeft className="h-5 w-5 text-content-on-dark" />
             </button>
 
             {/* Next image button */}
             <button
               type="button"
               onClick={scrollNext}
-              className="absolute top-1/2 right-3 z-10 -translate-y-1/2 rounded-full! bg-black/35 p-2.5 backdrop-blur-sm transition-smooth duration-300 hover:bg-black/55"
+              className="absolute top-1/2 right-3 z-10 -translate-y-1/2 rounded-full! bg-black/35 p-2.5 backdrop-blur-sm transition-smooth hover:bg-black/55"
               aria-label="Next image"
             >
-              <ChevronRight className="h-5 w-5 text-white" />
+              <ChevronRight className="h-5 w-5 text-content-on-dark" />
             </button>
           </>
         )}
@@ -154,10 +145,10 @@ export default function ItemImage({ images, alt, category }: ItemImageProps) {
               key={index}
               type="button"
               onClick={() => scrollTo(index)}
-              className={`h-2 rounded-full transition-smooth duration-300 ${
+              className={`h-2 rounded-full transition-all ${
                 index === selectedIndex
-                  ? "w-8 bg-orange-500"
-                  : "w-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500"
+                  ? "w-8 bg-brand"
+                  : "w-2 bg-indicator-inactive hover:bg-brand-subtle"
               }`}
               aria-label={`Go to image ${index + 1}`}
             />

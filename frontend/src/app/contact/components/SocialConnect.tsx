@@ -33,7 +33,7 @@ const socials = [
     description: "Follow for daily specials and updates",
     icon: <FacebookIcon />,
     href: "https://facebook.com/KochiGuruPizza",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "bg-linear-to-br from-blue-500 to-blue-700",
     hoverBg: "hover:bg-blue-50 dark:hover:bg-blue-900/10",
     hoverBorder: "hover:border-blue-200 dark:hover:border-blue-800"
   },
@@ -43,7 +43,7 @@ const socials = [
     description: "See our pizzas before you taste them",
     icon: <InstagramIcon />,
     href: "https://instagram.com/kochigurupizza",
-    gradient: "from-pink-500 to-orange-500",
+    gradient: "bg-linear-to-br from-pink-500 to-orange-500",
     hoverBg: "hover:bg-pink-50 dark:hover:bg-pink-900/10",
     hoverBorder: "hover:border-pink-200 dark:hover:border-pink-800"
   },
@@ -53,7 +53,7 @@ const socials = [
     description: "Message us directly for quick replies",
     icon: <WhatsAppIcon />,
     href: "https://wa.me/94770776848",
-    gradient: "from-green-500 to-green-600",
+    gradient: "bg-linear-to-br from-green-500 to-green-600",
     hoverBg: "hover:bg-green-50 dark:hover:bg-green-900/10",
     hoverBorder: "hover:border-green-200 dark:hover:border-green-800"
   },
@@ -63,15 +63,15 @@ const socials = [
     description: "Call us during opening hours",
     icon: <Phone className="w-6 h-6" />,
     href: "tel:0770776848",
-    gradient: "from-orange-400 to-orange-600",
-    hoverBg: "hover:bg-orange-50 dark:hover:bg-orange-900/10",
-    hoverBorder: "hover:border-orange-200 dark:hover:border-orange-800"
+    gradient: "bg-blob-gradient",
+    hoverBg: "hover:bg-brand-wash dark:hover:bg-brand-wash/10",
+    hoverBorder: "hover:border-brand/30"
   }
 ];
 
 export default function SocialConnect() {
   return (
-    <section className="py-20 md:py-24 bg-orange-50/30 dark:bg-gray-900 transition-colors duration-300">
+    <section className="py-20 md:py-24 bg-surface-alternate/30 dark:bg-surface-alternate transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -80,13 +80,13 @@ export default function SocialConnect() {
           transition={{ duration: 0.6 }}
           className="text-center mb-14 gpu-fix"
         >
-          <span className="inline-block text-orange-600 dark:text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3">
+          <span className="inline-block text-brand font-semibold text-sm uppercase tracking-widest mb-3">
             Stay Connected
           </span>
-          <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-4">
             Find Us Online
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-content-muted max-w-2xl mx-auto">
             Follow our journey, get daily specials, and reach us on the platform
             that works best for you.
           </p>
@@ -102,20 +102,20 @@ export default function SocialConnect() {
                   social.name !== "Phone" ? "noopener noreferrer" : undefined
                 }
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className={`group flex flex-col items-center text-center bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-7 transition-smooth duration-300 hover:shadow-xl ${social.hoverBg} ${social.hoverBorder} gpu-fix h-full`}
+                className={`group flex flex-col items-center text-center bg-surface-card rounded-2xl shadow-md border border-divider-card p-7 transition-smooth hover:shadow-xl ${social.hoverBg} ${social.hoverBorder} gpu-fix h-full`}
               >
                 <div
-                  className={`flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br ${social.gradient} text-white mb-5 shadow-md group-hover:scale-110 transition-transform duration-300`}
+                  className={`flex items-center justify-center w-16 h-16 rounded-2xl ${social.gradient} text-brand-on mb-5 shadow-md group-hover:scale-110 transition-transform`}
                 >
                   {social.icon}
                 </div>
-                <h3 className="font-heading text-lg font-bold text-gray-900 dark:text-white mb-1">
+                <h3 className="font-heading text-lg font-bold text-content-main mb-1">
                   {social.name}
                 </h3>
-                <p className="text-orange-600 dark:text-orange-500 font-semibold text-sm mb-2">
+                <p className="text-brand font-semibold text-sm mb-2">
                   {social.handle}
                 </p>
-                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                <p className="text-content-muted text-sm leading-relaxed">
                   {social.description}
                 </p>
               </motion.a>

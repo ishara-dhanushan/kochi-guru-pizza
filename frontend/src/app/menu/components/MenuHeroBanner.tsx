@@ -15,18 +15,18 @@ export default function MenuHeroBanner() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
           className="gpu-fix"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 text-white text-sm font-medium mb-6 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 text-brand-on text-sm font-medium mb-6 backdrop-blur-sm">
             <UtensilsCrossed className="w-4 h-4" />
             Freshly made every day
           </div>
-          <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 drop-shadow-lg">
+          <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold text-brand-on mb-6 drop-shadow-lg">
             Our Menu
           </h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+          <p className="text-xl md:text-2xl text-brand-on/90 max-w-2xl mx-auto drop-shadow-md">
             Wood-fired pizzas, hearty pastas, juicy burgers, and refreshing
             drinks — something for every craving.
           </p>

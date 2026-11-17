@@ -45,12 +45,12 @@ export default async function MenuItemDetailPage({ params }: Props) {
     <>
       <Header />
 
-      <main className="pb-32 bg-white dark:bg-gray-950">
+      <main className="pb-32 bg-surface">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           {/* Back to menu — always at the top */}
           <Link
             href="/menu"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 dark:text-gray-500 hover:text-orange-500 dark:hover:text-orange-400 transition-colors group mb-10"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-content-muted hover:text-brand transition-colors group mb-10"
           >
             <ArrowLeft
               size={15}
@@ -76,7 +76,7 @@ export default async function MenuItemDetailPage({ params }: Props) {
               <ItemMeta item={item} />
 
               {/* Divider */}
-              <div className="h-px bg-gray-100 dark:bg-gray-800" />
+              <div className="h-px bg-divider-subtle" />
 
               {/* Pricing */}
               <ItemPricing item={item} />

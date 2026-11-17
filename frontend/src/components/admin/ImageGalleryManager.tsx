@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useDropzone } from "react-dropzone";
-import { X, Upload, ArrowUpCircle } from "lucide-react";
+import { X, Upload, ArrowUpCircle, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { httpClient } from "@/lib/httpClient";
 
@@ -17,11 +18,44 @@ export default function ImageGalleryManager({
   onChange
 }: ImageGalleryManagerProps) {
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   const [imageToDelete, setImageToDelete] = useState<{
     url: string;
     index: number;
   } | null>(null);
+
+  // Prevent duplicate deletion requests and dismissal during deletion.
+  const deletingRef = useRef(false);
+  const deleteDialogOpenRef = useRef(false);
+
+  // Close the image deletion confirmation modal.
+  const closeDeleteDialog = useCallback(() => {
+    // Do not allow dismissal while the deletion request is in progress.
+    if (deletingRef.current) return;
+    deleteDialogOpenRef.current = false;
+
+    setIsDeleteDialogOpen(false);
+    setImageToDelete(null);
+  }, []);
+
+  // Close the modal when the Escape key is pressed.
+  useEffect(() => {
+    if (!isDeleteDialogOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeDeleteDialog();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isDeleteDialogOpen, closeDeleteDialog]);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -63,23 +97,35 @@ export default function ImageGalleryManager({
   });
 
   const confirmDelete = async () => {
-    if (!imageToDelete) return;
+    if (!imageToDelete || deletingRef.current || !deleteDialogOpenRef.current) {
+      return;
+    }
+
+    // Lock the deletion operation and display the loading state.
+    deletingRef.current = true;
+    setDeleting(true);
+
     try {
       await httpClient<{ message: string }>("/images", {
         method: "DELETE",
         body: JSON.stringify({ url: imageToDelete.url })
       });
+
       const newImages = [...initialImages];
       newImages.splice(imageToDelete.index, 1);
+
       onChange(newImages);
       toast.success("Image removed");
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Failed to remove image";
+
       toast.error(message);
     } finally {
-      setIsDeleteDialogOpen(false);
-      setImageToDelete(null);
+      // Release the deletion lock before closing the modal.
+      deletingRef.current = false;
+      setDeleting(false);
+      closeDeleteDialog();
     }
   };
 
@@ -96,24 +142,26 @@ export default function ImageGalleryManager({
       <div className="space-y-4">
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-200 ${
+          className={`group border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
             isDragActive
-              ? "border-orange-500 bg-orange-50 dark:bg-orange-900/20"
-              : "border-gray-200 dark:border-gray-700 hover:border-orange-400 dark:hover:border-orange-600"
+              ? "border-brand bg-brand-wash dark:bg-brand-wash/20"
+              : "border-divider-standard hover:border-brand-muted"
           }`}
         >
           <input {...getInputProps()} />
           <div className="flex flex-col items-center gap-2">
             <Upload
-              className="text-gray-400 group-hover:text-orange-500 transition-colors"
+              className="text-content-faint group-hover:text-brand transition-colors"
               size={32}
             />
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-content-muted">
               {uploading
                 ? "Uploading..."
                 : "Drag & drop images here, or click to select"}
             </p>
-            <p className="text-xs text-gray-400">JPEG, PNG, WebP (Max 5MB)</p>
+            <p className="text-xs text-content-muted">
+              JPEG, PNG, WebP (Max 5MB)
+            </p>
           </div>
         </div>
 
@@ -121,7 +169,7 @@ export default function ImageGalleryManager({
           {initialImages.map((url, index) => (
             <div
               key={url}
-              className="relative group aspect-square rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"
+              className="relative group aspect-square rounded-xl overflow-hidden border border-divider-standard bg-surface-inset"
             >
               <Image
                 src={url}
@@ -132,7 +180,7 @@ export default function ImageGalleryManager({
               />
 
               {index === 0 && (
-                <div className="absolute top-2 left-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <div className="absolute top-2 left-2 bg-brand text-brand-on text-[10px] font-bold px-2 py-0.5 rounded-full">
                   PRIMARY
                 </div>
               )}
@@ -151,10 +199,13 @@ export default function ImageGalleryManager({
                 <button
                   type="button"
                   onClick={() => {
+                    if (deletingRef.current) return;
+
+                    deleteDialogOpenRef.current = true;
                     setImageToDelete({ url, index });
                     setIsDeleteDialogOpen(true);
                   }}
-                  className="p-2 bg-red-500/80 hover:bg-red-600 text-white rounded-lg backdrop-blur-sm transition-all"
+                  className="p-2 bg-danger-action/80 hover:bg-danger-action-hover text-feedback-on rounded-lg backdrop-blur-sm transition-all"
                   title="Remove image"
                 >
                   <X size={18} />
@@ -162,46 +213,83 @@ export default function ImageGalleryManager({
               </div>
             </div>
           ))}
+
           {initialImages.length === 0 && !uploading && (
-            <div className="col-span-full py-12 text-center text-gray-400 text-sm italic">
+            <div className="col-span-full py-12 text-center text-content-muted text-sm italic">
               No images uploaded yet
             </div>
           )}
         </div>
       </div>
 
-      {isDeleteDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-xl border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-              Delete Image?
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Are you sure you want to remove this image? This action is
-              permanent and cannot be undone.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsDeleteDialogOpen(false);
-                  setImageToDelete(null);
-                }}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+      {/* Delete Image Confirmation Modal */}
+      <AnimatePresence>
+        {isDeleteDialogOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, pointerEvents: "none" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) {
+                closeDeleteDialog();
+              }
+            }}
+          >
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-image-title"
+              aria-busy={deleting}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="bg-surface-card rounded-2xl p-6 max-w-sm w-full shadow-xl border border-divider-standard"
+            >
+              <h3
+                id="delete-image-title"
+                className="text-lg font-bold text-content-main mb-2"
               >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={confirmDelete}
-                className="px-4 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
-              >
-                Delete Permanently
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                Delete Image?
+              </h3>
+
+              <p className="text-sm text-content-muted mb-6">
+                Are you sure you want to remove this image? This action is
+                permanent and cannot be undone.
+              </p>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={closeDeleteDialog}
+                  disabled={deleting}
+                  className="px-4 py-2 text-sm font-medium text-content-subtle enabled:hover:bg-surface-card-hover rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium bg-danger-action enabled:hover:bg-danger-action-hover text-feedback-on rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {deleting && (
+                    <Loader2
+                      size={16}
+                      className="animate-spin"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <span>{deleting ? "Deleting..." : "Delete Permanently"}</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

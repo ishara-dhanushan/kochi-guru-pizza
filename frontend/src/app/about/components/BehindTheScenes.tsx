@@ -40,7 +40,7 @@ const steps = [
 
 export default function BehindTheScenes() {
   return (
-    <section className="py-20 md:py-24 bg-orange-50/30 dark:bg-gray-900 transition-colors duration-300 overflow-x-hidden">
+    <section className="py-20 md:py-24 bg-surface-alternate/30 dark:bg-surface-alternate transition-colors overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left — Text Content */}
@@ -51,16 +51,13 @@ export default function BehindTheScenes() {
             transition={{ duration: 0.6 }}
             className="gpu-fix"
           >
-            <span className="inline-block text-orange-600 dark:text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3">
+            <span className="inline-block text-brand font-semibold text-sm uppercase tracking-widest mb-3">
               Our Process
             </span>
-            <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5">
-              Behind Every{" "}
-              <span className="text-orange-600 dark:text-orange-500">
-                Perfect Slice
-              </span>
+            <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-5">
+              Behind Every <span className="text-brand">Perfect Slice</span>
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-10">
+            <p className="text-lg text-content-muted leading-relaxed mb-10">
               The best pizzas are not accidents — they are the result of
               deliberate craft, quality ingredients, and a kitchen that takes
               pride in every step. Here is how our process works.
@@ -75,23 +72,23 @@ export default function BehindTheScenes() {
                 >
                   {/* Step number + icon */}
                   <div className="flex flex-col items-center">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-linear-to-br from-orange-400 to-orange-600 text-white shrink-0 shadow-md group-hover:scale-105 transition-transform duration-200">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blob-gradient text-brand-on shrink-0 shadow-md group-hover:scale-105 transition-transform">
                       {step.icon}
                     </div>
                     {/* Connector line */}
-                    <div className="w-px flex-1 bg-orange-200 dark:bg-orange-900/40 mt-2 min-h-[20px] last:hidden" />
+                    <div className="w-px flex-1 bg-brand-decoration dark:bg-brand-decoration/40 mt-2 min-h-5 last:hidden" />
                   </div>
                   {/* Content */}
                   <div className="pb-6">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-orange-500 dark:text-orange-400 tracking-widest">
+                      <span className="text-xs font-bold text-brand tracking-widest">
                         STEP {step.step}
                       </span>
                     </div>
-                    <h3 className="font-heading text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    <h3 className="font-heading text-lg font-semibold text-content-main mb-1">
                       {step.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">
+                    <p className="text-content-muted leading-relaxed text-sm">
                       {step.description}
                     </p>
                   </div>
@@ -110,12 +107,12 @@ export default function BehindTheScenes() {
           >
             {/* Large top-left tile */}
             <div className="col-span-2 rounded-2xl overflow-hidden bg-linear-to-br from-orange-500 via-orange-600 to-red-600 aspect-video flex items-center justify-center shadow-xl">
-              <div className="text-center text-white px-6">
+              <div className="text-center text-brand-on px-6">
                 <Flame className="w-14 h-14 mx-auto mb-3 opacity-90" />
                 <p className="font-heading text-xl font-bold">
                   Wood-Fired Oven
                 </p>
-                <p className="text-white/80 text-sm mt-1">
+                <p className="text-brand-on/80 text-sm mt-1">
                   Where the magic happens
                 </p>
               </div>
@@ -123,25 +120,25 @@ export default function BehindTheScenes() {
 
             {/* Bottom left */}
             <div className="rounded-2xl overflow-hidden bg-linear-to-br from-amber-400 to-orange-500 aspect-square flex items-center justify-center shadow-md">
-              <div className="text-center text-white px-4">
+              <div className="text-center text-brand-on px-4">
                 <Wheat className="w-10 h-10 mx-auto mb-2 opacity-90" />
                 <p className="font-heading text-base font-bold">Fresh Dough</p>
-                <p className="text-white/80 text-xs mt-0.5">Daily</p>
+                <p className="text-brand-on/80 text-xs mt-0.5">Daily</p>
               </div>
             </div>
 
             {/* Bottom right */}
             <div className="rounded-2xl overflow-hidden bg-linear-to-br from-rose-400 to-orange-500 aspect-square flex items-center justify-center shadow-md">
-              <div className="text-center text-white px-4">
+              <div className="text-center text-brand-on px-4">
                 <Sparkles className="w-10 h-10 mx-auto mb-2 opacity-90" />
                 <p className="font-heading text-base font-bold">House Sauce</p>
-                <p className="text-white/80 text-xs mt-0.5">
+                <p className="text-brand-on/80 text-xs mt-0.5">
                   Made from scratch
                 </p>
               </div>
             </div>
 
-            <p className="col-span-2 text-center text-xs text-gray-400 dark:text-gray-500 -mt-1">
+            <p className="col-span-2 text-center text-xs text-content-faint -mt-1">
               Replace tiles above with real kitchen photos for best results
             </p>
           </motion.div>

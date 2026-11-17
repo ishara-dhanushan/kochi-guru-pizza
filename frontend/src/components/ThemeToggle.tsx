@@ -38,22 +38,22 @@ export default function ThemeToggle() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-soft hover:bg-surface-soft-hover transition-colors"
         aria-label="Toggle theme"
       >
-        <CurrentIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
+        <CurrentIcon className="w-5 h-5 text-content-muted" />
+        <span className="text-sm font-medium text-content-muted hidden sm:inline">
           {currentOption.label}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-700 dark:text-gray-300 transition-transform ${
+          className={`w-4 h-4 text-content-muted transition-transform ${
             isOpen ? "rotate-180" : ""
           }`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+        <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-surface-card border border-divider-standard overflow-hidden z-50">
           {options.map(({ value, icon: Icon, label }) => (
             <button
               key={value}
@@ -63,17 +63,13 @@ export default function ThemeToggle() {
               }}
               className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
                 theme === value
-                  ? "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-500"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  ? "bg-brand/15 text-brand"
+                  : "hover:bg-surface-card-hover text-content-muted"
               }`}
             >
               <Icon className="w-5 h-5" />
               <span className="text-sm font-medium">{label}</span>
-              {theme === value && (
-                <span className="ml-auto text-orange-600 dark:text-orange-500">
-                  ✓
-                </span>
-              )}
+              {theme === value && <span className="ml-auto text-xs">✓</span>}
             </button>
           ))}
         </div>

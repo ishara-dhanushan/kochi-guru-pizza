@@ -47,7 +47,7 @@ const usps: USP[] = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="py-20 md:py-24 bg-white dark:bg-gray-950 transition-colors duration-300">
+    <section className="py-20 md:py-24 bg-surface transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -57,10 +57,10 @@ export default function WhyChooseUs() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 gpu-fix"
         >
-          <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-4">
             Why Choose Us
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-content-muted max-w-2xl mx-auto">
             Discover what makes us the best pizza destination in Kochi
           </p>
         </motion.div>
@@ -71,20 +71,20 @@ export default function WhyChooseUs() {
             <ScrollAnimatedItem key={usp.id} className="h-full">
               <motion.div
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-smooth duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 p-6 gpu-fix h-full"
+                className="group bg-surface-card rounded-xl shadow-md hover:shadow-xl transition-smooth overflow-hidden border border-divider-card p-6 gpu-fix h-full"
               >
                 {/* Icon Container */}
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-orange-400 to-orange-600 text-white mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blob-gradient text-brand-on mb-4 group-hover:scale-110 transition-transform">
                   {usp.icon}
                 </div>
 
                 {/* Title */}
-                <h3 className="font-heading text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                <h3 className="font-heading text-xl font-semibold text-content-main mb-3">
                   {usp.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p className="text-content-muted leading-relaxed">
                   {usp.description}
                 </p>
               </motion.div>

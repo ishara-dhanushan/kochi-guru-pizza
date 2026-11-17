@@ -50,19 +50,19 @@ function FaqItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-smooth duration-300">
+    <div className="border border-divider-card rounded-xl overflow-hidden bg-surface-card shadow-sm hover:shadow-md transition-smooth">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
       >
-        <span className="font-heading font-semibold text-gray-900 dark:text-white text-base leading-snug">
+        <span className="font-heading font-semibold text-content-main text-base leading-snug">
           {question}
         </span>
         <div
-          className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 transition-all duration-300 ${
+          className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 transition-all ${
             isOpen
-              ? "bg-orange-600 text-white rotate-180"
-              : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+              ? "bg-brand text-brand-on rotate-180"
+              : "bg-surface-inset text-content-muted"
           }`}
         >
           <ChevronDown className="w-4 h-4" />
@@ -79,10 +79,8 @@ function FaqItem({
             className="overflow-hidden"
           >
             <div className="px-6 pb-5">
-              <div className="h-px bg-gray-100 dark:bg-gray-700 mb-4" />
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                {answer}
-              </p>
+              <div className="h-px bg-divider-standard mb-4" />
+              <p className="text-content-muted leading-relaxed">{answer}</p>
             </div>
           </motion.div>
         )}
@@ -99,7 +97,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className="py-20 md:py-24 bg-white dark:bg-gray-950 transition-colors duration-300">
+    <section className="py-20 md:py-24 bg-surface transition-colors">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -108,13 +106,13 @@ export default function FAQ() {
           transition={{ duration: 0.6 }}
           className="text-center mb-14 gpu-fix"
         >
-          <span className="inline-block text-orange-600 dark:text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3">
+          <span className="inline-block text-brand font-semibold text-sm uppercase tracking-widest mb-3">
             Common Questions
           </span>
-          <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-4">
             Frequently Asked
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-lg text-content-muted">
             Everything you need to know before your visit or order.
           </p>
         </motion.div>
@@ -142,12 +140,12 @@ export default function FAQ() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: false, amount: 0.5 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-center text-sm text-gray-400 dark:text-gray-500 mt-10 gpu-fix"
+          className="text-center text-sm text-content-faint mt-10 gpu-fix"
         >
           Still have a question?{" "}
           <a
             href="tel:0770776848"
-            className="text-orange-600 dark:text-orange-500 font-semibold hover:underline"
+            className="text-brand font-semibold hover:underline"
           >
             Give us a call
           </a>{" "}

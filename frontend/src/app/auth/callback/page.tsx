@@ -96,29 +96,27 @@ function AuthCallbackContent() {
   }, [searchParams, router, refreshUser]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center bg-surface transition-colors">
       <div className="text-center w-full max-w-sm mx-auto p-8">
         {status === "loading" && (
           <>
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-800 border-t-orange-600 dark:border-t-orange-500 mx-auto mb-6"></div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-divider-subtle border-t-brand mx-auto mb-6"></div>
+            <h2 className="text-2xl font-bold text-content-main mb-2">
               Authenticating
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 font-medium">
-              Please wait...
-            </p>
+            <p className="text-content-muted font-medium">Please wait...</p>
           </>
         )}
 
         {status === "success" && (
           <>
             <div className="mb-6">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto animate-pulse drop-shadow-md" />
+              <CheckCircle className="w-16 h-16 text-success mx-auto animate-pulse drop-shadow-md" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-2xl font-bold text-content-main mb-2">
               Authentication Success
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 font-medium">
+            <p className="text-content-muted font-medium">
               Redirecting you to the homepage...
             </p>
           </>
@@ -127,12 +125,12 @@ function AuthCallbackContent() {
         {status === "error" && (
           <>
             <div className="mb-6">
-              <XCircle className="w-16 h-16 text-red-500 mx-auto drop-shadow-md" />
+              <XCircle className="w-16 h-16 text-danger mx-auto drop-shadow-md" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-2xl font-bold text-content-main mb-2">
               Authentication Failed
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 font-medium">
+            <p className="text-content-muted font-medium">
               Redirecting you back...
             </p>
           </>
@@ -146,15 +144,13 @@ export default function AuthCallback() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 transition-colors duration-300">
+        <div className="min-h-screen flex items-center justify-center bg-surface transition-colors">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 dark:border-gray-800 border-t-orange-600 dark:border-t-orange-500 mx-auto mb-6"></div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-divider-subtle border-t-brand mx-auto mb-6"></div>
+            <h2 className="text-2xl font-bold text-content-main mb-2">
               Loading...
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 font-medium">
-              Please wait
-            </p>
+            <p className="text-content-muted font-medium">Please wait</p>
           </div>
         </div>
       }

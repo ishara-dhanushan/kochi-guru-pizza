@@ -56,10 +56,14 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Settings", href: "/dashboard/settings", icon: Settings }
 ];
 
-export default function DashboardSidebar() {
+interface SidebarContentProps {
+  onNavigate: () => void;
+}
+
+// Shared sidebar content for desktop and mobile layouts.
+function SidebarContent({ onNavigate }: SidebarContentProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const visibleItems = NAV_ITEMS.filter(
     (item) => !item.adminOnly || user?.role === "admin"
@@ -70,10 +74,10 @@ export default function DashboardSidebar() {
     return pathname.startsWith(href);
   };
 
-  const SidebarContent = () => (
+  return (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+      <div className="flex items-center gap-3 px-6 py-5 border-b border-divider-subtle">
         <Image
           src="/logo.svg"
           alt="Kochi Guru Pizza"
@@ -82,10 +86,10 @@ export default function DashboardSidebar() {
           className="rounded-lg"
         />
         <div>
-          <p className="font-bold text-sm text-gray-900 dark:text-white leading-tight">
+          <p className="font-bold text-sm text-content-main leading-tight">
             Kochi Guru Pizza
           </p>
-          <p className="text-xs text-orange-500 font-medium capitalize">
+          <p className="text-xs text-brand font-medium capitalize">
             {user?.role} Panel
           </p>
         </div>
@@ -100,28 +104,34 @@ export default function DashboardSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
+              onClick={onNavigate}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
                 active
-                  ? "bg-orange-500 text-white shadow-md shadow-orange-500/20"
-                  : "text-gray-600 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-orange-900/10 hover:text-orange-600 dark:hover:text-orange-400"
+                  ? "bg-brand text-brand-on shadow-md shadow-brand/50"
+                  : "text-content-muted hover:bg-brand-wash dark:hover:bg-brand-wash/25 hover:text-brand"
               }`}
             >
               <Icon
                 size={18}
-                className={`shrink-0 ${active ? "text-white" : "text-gray-400 group-hover:text-orange-500"}`}
+                className={`shrink-0 ${
+                  active
+                    ? "text-brand-on"
+                    : "text-content-faint group-hover:text-brand"
+                }`}
               />
               <span className="flex-1">{item.label}</span>
-              {active && <ChevronRight size={14} className="text-white/70" />}
+              {active && (
+                <ChevronRight size={14} className="text-brand-on/70" />
+              )}
             </Link>
           );
         })}
       </nav>
 
       {/* User footer */}
-      <div className="px-3 py-4 border-t border-gray-100 dark:border-gray-800">
-        <div className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-          <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="px-3 py-4 border-t border-divider-subtle">
+        <div className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-surface-inset/50">
+          <div className="w-8 h-8 rounded-full bg-brand-decoration dark:bg-brand-decoration/30 flex items-center justify-center shrink-0 overflow-hidden">
             {user?.profilePicture ? (
               <Image
                 src={user.profilePicture}
@@ -131,53 +141,63 @@ export default function DashboardSidebar() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-orange-600 dark:text-orange-400 font-bold text-sm">
+              <span className="text-brand font-bold text-sm">
                 {user?.name?.charAt(0).toUpperCase()}
               </span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+            <p className="text-sm font-semibold text-content-main truncate">
               {user?.name}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
+            <p className="text-xs text-content-muted truncate capitalize">
               {user?.role}
             </p>
           </div>
         </div>
+
         <Link
           href="/"
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-orange-900/10 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-200 group mb-0.5"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-content-muted hover:bg-brand-wash dark:hover:bg-brand-wash/25 hover:text-brand transition-all group mb-0.5"
         >
           <Home
             size={18}
-            className="shrink-0 text-gray-400 group-hover:text-orange-500"
+            className="shrink-0 text-content-faint group-hover:text-brand"
           />
           Back to Homepage
         </Link>
+
         <button
           onClick={logout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 group"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-content-muted hover:bg-danger-wash dark:hover:bg-danger-wash/25 hover:text-danger transition-all group"
         >
           <LogOut
             size={18}
-            className="shrink-0 text-gray-400 group-hover:text-red-500"
+            className="shrink-0 text-content-faint group-hover:text-danger"
           />
           Logout
         </button>
       </div>
     </div>
   );
+}
+
+export default function DashboardSidebar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const closeMobileSidebar = () => {
+    setMobileOpen(false);
+  };
 
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 shrink-0 h-screen sticky top-0 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 shadow-sm">
-        <SidebarContent />
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 h-screen sticky top-0 bg-surface-card border-r border-divider-subtle shadow-sm">
+        <SidebarContent onNavigate={closeMobileSidebar} />
       </aside>
 
       {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-surface-card border-b border-divider-subtle px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <Image
             src="/logo.svg"
@@ -186,15 +206,13 @@ export default function DashboardSidebar() {
             height={28}
             className="rounded-md"
           />
-          <span className="font-bold text-gray-900 dark:text-white text-sm">
-            Dashboard
-          </span>
+          <span className="font-bold text-content-main text-sm">Dashboard</span>
         </div>
         <button
           onClick={() => setMobileOpen(true)}
-          className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="p-2 rounded-xl hover:bg-surface-card-hover transition-colors"
         >
-          <Menu size={20} className="text-gray-600 dark:text-gray-300" />
+          <Menu size={20} className="text-content-subtle" />
         </button>
       </div>
 
@@ -214,21 +232,19 @@ export default function DashboardSidebar() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-white dark:bg-gray-900 shadow-2xl flex flex-col"
+              className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-surface-card shadow-2xl flex flex-col"
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-                <span className="font-bold text-gray-900 dark:text-white">
-                  Menu
-                </span>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-divider-subtle">
+                <span className="font-bold text-content-main">Menu</span>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-surface-card-hover transition-colors"
                 >
-                  <X size={18} className="text-gray-500" />
+                  <X size={18} className="text-content-muted" />
                 </button>
               </div>
               <div className="flex-1 overflow-hidden">
-                <SidebarContent />
+                <SidebarContent onNavigate={closeMobileSidebar} />
               </div>
             </motion.aside>
           </>
