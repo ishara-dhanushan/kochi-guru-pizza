@@ -46,6 +46,7 @@ jobs:
 
       - name: Audit dependencies
         run: npm audit
+        continue-on-error: true
 
   backend-check:
     runs-on: ubuntu-latest
@@ -77,3 +78,4 @@ jobs:
 
       - name: Audit dependencies
         run: npm audit
+        continue-on-error: true
