@@ -14,7 +14,7 @@ export default function DashboardLayout({
 }) {
   return (
     <DashboardGuard>
-      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="flex min-h-screen bg-surface">
         <DashboardSidebar />
         {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0 lg:pt-0 pt-14">

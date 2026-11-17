@@ -50,8 +50,8 @@ export default function EditMenuItemPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3">
-        <Loader2 size={32} className="animate-spin text-orange-500" />
-        <p className="text-sm text-gray-400">Loading item...</p>
+        <Loader2 size={32} className="animate-spin text-brand" />
+        <p className="text-sm text-content-muted">Loading item...</p>
       </div>
     );
   }
@@ -63,16 +63,14 @@ export default function EditMenuItemPage() {
           <Search className="size-8 text-danger" aria-hidden="true" />
         </div>
         <div className="text-center">
-          <h2 className="font-bold text-gray-900 dark:text-white">
-            Item not found
-          </h2>
-          <p className="text-sm text-gray-400 mt-1">
+          <h2 className="font-bold text-content-main">Item not found</h2>
+          <p className="text-sm text-content-muted mt-1">
             This menu item doesn&apos;t exist or has been deleted.
           </p>
         </div>
         <button
           onClick={() => router.push("/dashboard/menu")}
-          className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold transition-colors"
+          className="px-4 py-2 bg-brand hover:bg-brand-hover text-brand-on rounded-xl text-sm font-semibold transition-colors"
         >
           Back to Menu
         </button>

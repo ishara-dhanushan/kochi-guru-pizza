@@ -23,7 +23,7 @@
   /* Surfaces */
   --surface: var(--color-white);
   --surface-hover: var(--color-gray-100);
-  --surface-card: var(--color-white);
+  --surface-card: var(--color-gray-50);
   --surface-card-hover: var(--color-gray-100);
   --surface-soft: var(--color-gray-100);
   --surface-soft-hover: var(--color-gray-200);

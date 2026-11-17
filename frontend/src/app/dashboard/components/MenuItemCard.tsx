@@ -37,7 +37,7 @@ export default function MenuItemCard({
           {sorted.map((v) => (
             <span
               key={v.size}
-              className="text-xs bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 px-2 py-0.5 rounded-lg font-semibold capitalize border border-orange-100 dark:border-orange-800/30"
+              className="text-xs bg-brand-wash dark:bg-brand-wash/25 text-brand px-2 py-0.5 rounded-lg font-semibold capitalize border border-brand-decoration dark:border-brand-decoration/30"
             >
               {v.size[0].toUpperCase()}: Rs. {v.price.toLocaleString()}
             </span>
@@ -46,7 +46,7 @@ export default function MenuItemCard({
       );
     }
     return (
-      <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
+      <span className="text-sm font-bold text-brand">
         Rs. {item.price?.toLocaleString()}
       </span>
     );
@@ -58,14 +58,14 @@ export default function MenuItemCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className={`bg-white dark:bg-gray-800/50 rounded-xl border transition-all duration-200 hover:shadow-md group ${
+      className={`bg-surface-card rounded-xl border transition-all hover:shadow-md group ${
         item.isAvailable
-          ? "border-gray-100 dark:border-gray-700"
-          : "border-dashed border-gray-200 dark:border-gray-700 opacity-60"
+          ? "border-divider-card"
+          : "border-dashed border-divider-card opacity-60"
       }`}
     >
       <div className="flex items-start gap-3 p-4">
-        <div className="w-14 h-14 rounded-xl bg-orange-50 dark:bg-orange-900/10 flex items-center justify-center shrink-0 overflow-hidden border border-orange-100 dark:border-orange-900/20">
+        <div className="w-14 h-14 rounded-xl bg-brand-wash dark:bg-brand-wash/25 flex items-center justify-center shrink-0 overflow-hidden border border-brand-decoration dark:border-brand-decoration/20">
           {primaryImage ? (
             <Image
               src={primaryImage}
@@ -86,11 +86,11 @@ export default function MenuItemCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+              <h3 className="font-semibold text-content-main text-sm truncate">
                 {item.name}
               </h3>
               {item.description && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                <p className="text-xs text-content-muted mt-0.5 line-clamp-1">
                   {item.description}
                 </p>
               )}
@@ -98,8 +98,8 @@ export default function MenuItemCard({
             <span
               className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
                 item.isAvailable
-                  ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                  : "bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                  ? "bg-success-wash dark:bg-success-wash/25 text-success"
+                  : "bg-surface-inset text-content-muted"
               }`}
             >
               {item.isAvailable ? "Available" : "Unavailable"}
@@ -109,29 +109,29 @@ export default function MenuItemCard({
         </div>
       </div>
 
-      <div className="flex border-t border-gray-50 dark:border-gray-700/50">
+      <div className="flex border-t border-divider-subtle">
         <button
           onClick={() => onToggleAvailability(item)}
           title={item.isAvailable ? "Mark unavailable" : "Mark available"}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-gray-500 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-all duration-150 rounded-bl-xl"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-content-muted hover:text-brand hover:bg-brand-wash dark:hover:bg-brand-wash/25 transition-all rounded-bl-xl"
         >
           {item.isAvailable ? <EyeOff size={13} /> : <Eye size={13} />}
           {item.isAvailable ? "Hide" : "Show"}
         </button>
-        <div className="w-px bg-gray-50 dark:bg-gray-700/50" />
+        <div className="w-px bg-divider-subtle" />
         <button
           onClick={() => router.push(`/dashboard/menu/${item._id}`)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-150"
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-content-muted hover:text-info hover:bg-info-wash dark:hover:bg-info-wash/25 transition-all"
         >
           <Pencil size={13} />
           Edit
         </button>
         {user?.role === "admin" && (
           <>
-            <div className="w-px bg-gray-50 dark:bg-gray-700/50" />
+            <div className="w-px bg-divider-subtle" />
             <button
               onClick={() => onDelete(item)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all duration-150 rounded-br-xl"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-content-muted hover:text-danger hover:bg-danger-wash dark:hover:bg-danger-wash/25 transition-all rounded-br-xl"
             >
               <Trash2 size={13} />
               Delete
