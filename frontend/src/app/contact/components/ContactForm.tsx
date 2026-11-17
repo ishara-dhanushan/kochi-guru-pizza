@@ -54,12 +54,12 @@ export default function ContactForm() {
   };
 
   const inputBase =
-    "w-full px-4 py-3 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-smooth duration-200 outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent";
-  const inputBorder =
-    "border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700";
+    "w-full px-4 py-3 rounded-xl border bg-surface-inset text-content-main placeholder-content-muted transition-smooth outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand";
+
+  const inputBorder = "border-divider-control hover:border-brand/60";
 
   return (
-    <section className="py-20 md:py-24 bg-white dark:bg-gray-950 transition-colors duration-300 overflow-x-hidden">
+    <section className="py-20 md:py-24 bg-surface transition-colors overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Left — Intro */}
@@ -70,31 +70,28 @@ export default function ContactForm() {
             transition={{ duration: 0.6 }}
             className="gpu-fix"
           >
-            <span className="inline-block text-orange-600 dark:text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3">
+            <span className="inline-block text-brand font-semibold text-sm uppercase tracking-widest mb-3">
               Send Us a Message
             </span>
-            <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-5">
-              We Are{" "}
-              <span className="text-orange-600 dark:text-orange-500">
-                Listening
-              </span>
+            <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-5">
+              We Are <span className="text-brand">Listening</span>
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
+            <p className="text-lg text-content-muted leading-relaxed mb-8">
               Have a special request, want to book for a group, or need help
               with an order? Fill in the form and we will get back to you as
               soon as we can — usually within a few hours during opening hours.
             </p>
 
             {/* Response time note */}
-            <div className="flex items-start gap-4 p-5 bg-orange-50 dark:bg-orange-900/10 rounded-xl border border-orange-100 dark:border-orange-900/30">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-linear-to-br from-orange-400 to-orange-600 text-white shrink-0 mt-0.5">
+            <div className="flex items-start gap-4 p-5 bg-brand-wash dark:bg-brand-wash/25 rounded-xl border border-brand-decoration dark:border-brand-decoration/30">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blob-gradient text-brand-on shrink-0 mt-0.5">
                 <CheckCircle className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900 dark:text-white mb-1">
+                <p className="font-semibold text-content-main mb-1">
                   Quick Response Guarantee
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-content-muted">
                   We aim to respond to all messages within 2 hours during
                   opening hours (10 AM – 10 PM, every day).
                 </p>
@@ -110,7 +107,7 @@ export default function ContactForm() {
             transition={{ duration: 0.6 }}
             className="gpu-fix"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-8">
+            <div className="bg-surface-card rounded-2xl shadow-md border border-divider-card p-8">
               <AnimatePresence mode="wait">
                 {formState === "success" ? (
                   <motion.div
@@ -121,19 +118,19 @@ export default function ContactForm() {
                     transition={{ duration: 0.3 }}
                     className="flex flex-col items-center justify-center text-center py-12 gpu-fix"
                   >
-                    <div className="flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/20 mb-6">
-                      <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+                    <div className="flex items-center justify-center w-20 h-20 rounded-full bg-success-wash dark:bg-success-wash/20 mb-6">
+                      <CheckCircle className="w-10 h-10 text-success" />
                     </div>
-                    <h3 className="font-heading text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    <h3 className="font-heading text-2xl font-bold text-content-main mb-3">
                       Message Sent!
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8">
+                    <p className="text-content-muted mb-8">
                       Thanks for reaching out. We will get back to you within 2
                       hours during opening hours.
                     </p>
                     <button
                       onClick={() => setFormState("idle")}
-                      className="px-6 py-3 bg-linear-to-r from-orange-600 to-orange-500 text-white font-semibold rounded-xl hover:from-orange-700 hover:to-orange-600 transition-all duration-200 shadow-md"
+                      className="px-6 py-3 bg-brand-btn text-brand-on font-semibold rounded-xl hover:bg-brand-btn-hover transition-all shadow-md"
                     >
                       Send Another Message
                     </button>
@@ -150,8 +147,8 @@ export default function ContactForm() {
                     {/* Name + Phone */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                          Full Name <span className="text-orange-500">*</span>
+                        <label className="block text-sm font-semibold text-content-subtle mb-1.5">
+                          Full Name <span className="text-brand">*</span>
                         </label>
                         <input
                           type="text"
@@ -164,7 +161,7 @@ export default function ContactForm() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label className="block text-sm font-semibold text-content-subtle mb-1.5">
                           Phone Number
                         </label>
                         <input
@@ -180,8 +177,8 @@ export default function ContactForm() {
 
                     {/* Email */}
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                        Email Address <span className="text-orange-500">*</span>
+                      <label className="block text-sm font-semibold text-content-subtle mb-1.5">
+                        Email Address <span className="text-brand">*</span>
                       </label>
                       <input
                         type="email"
@@ -196,8 +193,8 @@ export default function ContactForm() {
 
                     {/* Subject */}
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                        Subject <span className="text-orange-500">*</span>
+                      <label className="block text-sm font-semibold text-content-subtle mb-1.5">
+                        Subject <span className="text-brand">*</span>
                       </label>
                       <select
                         name="subject"
@@ -219,8 +216,8 @@ export default function ContactForm() {
 
                     {/* Message */}
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                        Message <span className="text-orange-500">*</span>
+                      <label className="block text-sm font-semibold text-content-subtle mb-1.5">
+                        Message <span className="text-brand">*</span>
                       </label>
                       <textarea
                         name="message"
@@ -235,7 +232,7 @@ export default function ContactForm() {
 
                     {/* Error state */}
                     {formState === "error" && (
-                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/10 rounded-xl px-4 py-3 border border-red-100 dark:border-red-900/30">
+                      <div className="flex items-center gap-2 text-danger text-sm bg-danger-wash dark:bg-danger-wash/25 rounded-xl px-4 py-3 border border-danger-border">
                         <AlertCircle className="w-4 h-4 shrink-0" />
                         Something went wrong. Please try again or call us
                         directly.
@@ -246,7 +243,7 @@ export default function ContactForm() {
                     <button
                       type="submit"
                       disabled={formState === "submitting"}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 bg-linear-to-r from-orange-600 to-orange-500 text-white font-bold rounded-xl hover:from-orange-700 hover:to-orange-600 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="w-full flex items-center justify-center gap-2 py-3.5 bg-brand-btn text-brand-on font-bold rounded-xl hover:bg-brand-btn-hover shadow-lg shadow-brand/20 hover:shadow-brand/30 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {formState === "submitting" ? (
                         <>

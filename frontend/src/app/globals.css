@@ -15,6 +15,11 @@
   --brand-on: var(--color-white);
   --brand-inverse: var(--color-orange-400);
 
+  /* Primary light button on branded gradient backgrounds */
+  --surface-on-brand: var(--color-white);
+  --surface-on-brand-hover: var(--color-orange-50);
+  --brand-on-light: var(--color-orange-700);
+
   /* Surfaces */
   --surface: var(--color-white);
   --surface-hover: var(--color-gray-100);
@@ -98,7 +103,7 @@
   --surface-card-hover: var(--color-gray-800);
   --surface-soft: var(--color-gray-900);
   --surface-soft-hover: var(--color-gray-800);
-  --surface-alternate: var(--color-gray-900);
+  --surface-alternate: var(--color-gray-950);
   --surface-inset: var(--color-gray-800);
   --surface-placeholder: var(--color-gray-700);
   --surface-control-hover: var(--color-gray-700);
@@ -164,6 +169,11 @@
   --color-brand-decoration: var(--brand-decoration);
   --color-brand-on: var(--brand-on);
   --color-brand-inverse: var(--brand-inverse);
+
+  /* Primary light button on branded gradient backgrounds */
+  --color-surface-on-brand: var(--surface-on-brand);
+  --color-surface-on-brand-hover: var(--surface-on-brand-hover);
+  --color-brand-on-light: var(--brand-on-light);
 
   /* Surfaces */
   --color-surface: var(--surface);

@@ -30,7 +30,7 @@ const cardVariants = {
 
 export default function StorySection() {
   return (
-    <section className="py-20 md:py-24 bg-white dark:bg-gray-950 transition-smooth duration-300 overflow-x-hidden">
+    <section className="py-20 md:py-24 bg-surface transition-smooth overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div
@@ -40,16 +40,14 @@ export default function StorySection() {
             transition={{ duration: 0.6 }}
             className="gpu-fix"
           >
-            <span className="inline-block text-orange-600 dark:text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3">
+            <span className="inline-block text-brand font-semibold text-sm uppercase tracking-widest mb-3">
               Our Story
             </span>
-            <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-6">
               Crafted with Passion,{" "}
-              <span className="text-orange-600 dark:text-orange-500">
-                Served with Love
-              </span>
+              <span className="text-brand">Served with Love</span>
             </h2>
-            <div className="space-y-4 text-gray-600 dark:text-gray-400 text-lg leading-relaxed">
+            <div className="space-y-4 text-content-muted text-lg leading-relaxed">
               <p>
                 Kochi Guru Pizza was born from a simple dream — to bring
                 authentic Italian-style pizza to the people of Walasmulla.
@@ -82,12 +80,12 @@ export default function StorySection() {
               <motion.div
                 key={stat.label}
                 variants={cardVariants}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 p-6 text-center transition-smooth duration-300 gpu-fix"
+                className="bg-surface-card rounded-xl shadow-md border border-divider-card p-6 text-center transition-smooth gpu-fix"
               >
-                <div className="font-heading text-4xl font-bold text-orange-600 dark:text-orange-500 mb-2">
+                <div className="font-heading text-4xl font-bold text-brand mb-2">
                   {stat.value}
                 </div>
-                <div className="text-gray-600 dark:text-gray-400 font-medium">
+                <div className="text-content-muted font-medium">
                   {stat.label}
                 </div>
               </motion.div>

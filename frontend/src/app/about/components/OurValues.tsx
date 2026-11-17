@@ -40,7 +40,7 @@ const values = [
 
 export default function OurValues() {
   return (
-    <section className="py-20 md:py-24 bg-orange-50/30 dark:bg-gray-900 transition-colors duration-300">
+    <section className="py-20 md:py-24 bg-surface-alternate/30 dark:bg-surface-alternate transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -49,13 +49,13 @@ export default function OurValues() {
           transition={{ duration: 0.6 }}
           className="text-center mb-14 gpu-fix"
         >
-          <span className="inline-block text-orange-600 dark:text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3">
+          <span className="inline-block text-brand font-semibold text-sm uppercase tracking-widest mb-3">
             What We Stand For
           </span>
-          <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-4">
             Our Values
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-content-muted max-w-2xl mx-auto">
             These are not just words on a wall — they are the principles baked
             into everything we do.
           </p>
@@ -66,18 +66,18 @@ export default function OurValues() {
             <ScrollAnimatedItem key={value.title} className="h-full">
               <motion.div
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="group flex gap-5 bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition-smooth duration-300 border border-gray-100 dark:border-gray-700 p-7 gpu-fix h-full"
+                className="group flex gap-5 bg-surface-card rounded-2xl shadow-md hover:shadow-xl transition-smooth border border-divider-card p-7 gpu-fix h-full"
               >
                 <div
-                  className={`flex items-center justify-center w-14 h-14 rounded-xl bg-linear-to-br ${value.accent} text-white shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md`}
+                  className={`flex items-center justify-center w-14 h-14 rounded-xl bg-linear-to-br ${value.accent} text-brand-on shrink-0 group-hover:scale-110 transition-transform shadow-md`}
                 >
                   {value.icon}
                 </div>
                 <div>
-                  <h3 className="font-heading text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="font-heading text-xl font-semibold text-content-main mb-2">
                     {value.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-content-muted leading-relaxed">
                     {value.description}
                   </p>
                 </div>

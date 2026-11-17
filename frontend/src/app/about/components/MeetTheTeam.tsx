@@ -39,7 +39,7 @@ const team = [
 
 export default function MeetTheTeam() {
   return (
-    <section className="py-20 md:py-24 bg-white dark:bg-gray-950 transition-colors duration-300">
+    <section className="py-20 md:py-24 bg-surface transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -48,13 +48,13 @@ export default function MeetTheTeam() {
           transition={{ duration: 0.6 }}
           className="text-center mb-14 gpu-fix"
         >
-          <span className="inline-block text-orange-600 dark:text-orange-500 font-semibold text-sm uppercase tracking-widest mb-3">
+          <span className="inline-block text-brand font-semibold text-sm uppercase tracking-widest mb-3">
             The People Behind the Pizza
           </span>
-          <h2 className="font-heading text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="font-heading text-3xl md:text-5xl font-bold text-content-main mb-4">
             Meet Our Team
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-content-muted max-w-2xl mx-auto">
             Every great pizza starts with great people. These are the hands,
             hearts, and stories behind every slice.
           </p>
@@ -65,7 +65,7 @@ export default function MeetTheTeam() {
             <ScrollAnimatedItem key={member.name} className="h-full">
               <motion.div
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition-smooth duration-300 border border-gray-100 dark:border-gray-700 p-8 flex flex-col items-center text-center overflow-hidden gpu-fix h-full"
+                className="group relative bg-surface-card rounded-2xl shadow-md hover:shadow-xl transition-smooth border border-divider-card p-8 flex flex-col items-center text-center overflow-hidden gpu-fix h-full"
               >
                 {/* Subtle background glow */}
                 <div
@@ -74,26 +74,26 @@ export default function MeetTheTeam() {
 
                 {/* Avatar */}
                 <div
-                  className={`flex items-center justify-center w-20 h-20 rounded-full bg-linear-to-br ${member.gradient} text-white text-2xl font-bold font-heading mb-5 shadow-lg group-hover:scale-105 transition-transform duration-300`}
+                  className={`flex items-center justify-center w-20 h-20 rounded-full bg-linear-to-br ${member.gradient} text-brand-on text-2xl font-bold font-heading mb-5 shadow-lg group-hover:scale-105 transition-transform`}
                 >
                   {member.initials}
                 </div>
 
                 {/* Name & Role */}
-                <h3 className="font-heading text-xl font-bold text-gray-900 dark:text-white mb-1">
+                <h3 className="font-heading text-xl font-bold text-content-main mb-1">
                   {member.name}
                 </h3>
-                <div className="inline-flex items-center gap-1.5 text-orange-600 dark:text-orange-500 text-sm font-semibold mb-5">
+                <div className="inline-flex items-center gap-1.5 text-brand text-sm font-semibold mb-5">
                   {member.icon}
                   {member.role}
                 </div>
 
                 {/* Quote */}
                 <div className="relative">
-                  <span className="absolute -top-2 -left-1 text-4xl text-orange-200 dark:text-orange-900/50 font-serif leading-none select-none">
+                  <span className="absolute -top-2 -left-1 text-4xl text-brand-decoration font-serif leading-none select-none">
                     &ldquo;
                   </span>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed italic pl-4">
+                  <p className="text-content-muted leading-relaxed italic pl-4">
                     {member.quote}
                   </p>
                 </div>
@@ -108,7 +108,7 @@ export default function MeetTheTeam() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: false, amount: 0.5 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center text-sm text-gray-400 dark:text-gray-500 mt-10 gpu-fix"
+          className="text-center text-sm text-content-faint mt-10 gpu-fix"
         >
           Plus our wonderful front-of-house crew who make every visit memorable.
         </motion.p>
