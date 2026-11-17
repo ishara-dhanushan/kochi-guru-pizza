@@ -7,6 +7,7 @@ import { MenuItem } from "@typings/menu";
 import { useAuth } from "@contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import MenuCategoryIcon from "@components/MenuCategoryIcon";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -75,7 +76,10 @@ export default function MenuItemCard({
               unoptimized
             />
           ) : (
-            <span className="text-2xl">🍕</span>
+            <MenuCategoryIcon
+              category={item.category}
+              className="size-6 text-brand"
+            />
           )}
         </div>
 

@@ -4,6 +4,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { Pizza, ArrowRight } from "lucide-react";
 
 type PromotionSlide = {
   imageUrl: string;
@@ -51,7 +52,7 @@ const promotionSlides: PromotionSlide[] = [
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16">
-      <span className="text-5xl">🍕</span>
+      <Pizza className="size-12 text-brand" aria-hidden="true" />
       <p className="font-heading text-content-subtle text-base text-center">
         No active offers right now
       </p>
@@ -125,7 +126,8 @@ function OfferCard({ slide }: { slide: PromotionSlide }) {
               href="tel:0770776848"
               className="inline-flex items-center gap-2 w-fit px-6 md:px-7 py-2.5 md:py-3 rounded-lg font-bold text-[0.9rem] tracking-wider transition-colors bg-brand hover:bg-brand-hover text-brand-on"
             >
-              ORDER NOW →
+              ORDER NOW
+              <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
             </a>
           </div>
         </div>

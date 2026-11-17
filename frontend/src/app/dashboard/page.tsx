@@ -1,7 +1,13 @@
 // src/app/dashboard/page.tsx
 "use client";
 
-import { UtensilsCrossed, ShoppingCart, Users, TrendingUp } from "lucide-react";
+import {
+  UtensilsCrossed,
+  ShoppingCart,
+  Users,
+  TrendingUp,
+  Hand
+} from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -70,7 +76,11 @@ export default function DashboardPage() {
         className="mb-8"
       >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Welcome back, {user?.name?.split(" ")[0]} 👋
+          Welcome back, {user?.name?.split(" ")[0]}{" "}
+          <Hand
+            className="inline-block size-6 text-brand rotate-12 align-middle"
+            aria-hidden="true"
+          />
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{today}</p>
       </motion.div>

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import toast from "react-hot-toast";
 import { menuService } from "@services/menuService";
 import { MenuItem, CreateMenuItemPayload } from "@typings/menu";
@@ -59,8 +59,8 @@ export default function EditMenuItemPage() {
   if (notFound || !item) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-900/10 flex items-center justify-center text-3xl">
-          🔍
+        <div className="w-16 h-16 rounded-2xl bg-danger-wash dark:bg-danger-wash/25 flex items-center justify-center">
+          <Search className="size-8 text-danger" aria-hidden="true" />
         </div>
         <div className="text-center">
           <h2 className="font-bold text-gray-900 dark:text-white">
