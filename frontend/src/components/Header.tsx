@@ -38,7 +38,11 @@ const NavLinks = [
 const Header: React.FC = () => {
   const { user, logout, loading } = useAuth();
   const { theme, setTheme } = useTheme();
-  const pathname = usePathname();
+
+  const currentPathname = usePathname();
+  // Normalize the homepage pathname after Vercel ISR regeneration.
+  const pathname = currentPathname === "/index" ? "/" : currentPathname;
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isThemeExpanded, setIsThemeExpanded] = useState(false);
