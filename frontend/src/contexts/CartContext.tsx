@@ -4,19 +4,32 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useSyncExternalStore,
   type ReactNode
 } from "react";
 
-import type { CartItem, CartContextType } from "@typings/cart";
-import { VARIANT_CATEGORIES } from "@typings/menu";
+import type {
+  CartItem,
+  CartContextType,
+  PurchasedCartItem
+} from "@typings/cart";
 import type { MenuItem, PizzaSize } from "@typings/menu";
+import {
+  getCartItemKey,
+  getCartLineSubtotal,
+  getCartUnitPrice
+} from "@lib/cartPricing";
 
+// Preserve the existing storage key for previously stored carts.
 const CART_STORAGE_KEY = "kochi-guru-pizza-cart-v1";
 const CART_CHANGE_EVENT = "kochi-guru-pizza-cart-change";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+// Keep the existing imports in MenuItemCard and ItemPricing compatible.
+export { getCartUnitPrice };
 
 // Keep the cart usable in memory if localStorage is unavailable.
 let memorySnapshot = "[]";
@@ -60,35 +73,20 @@ function isPizzaSize(value: unknown): value is PizzaSize {
   return value === "small" || value === "medium" || value === "large";
 }
 
-// Only retain image URLs supported by the existing Next.js configuration.
-function getValidImageUrl(value: unknown): string | undefined {
-  if (typeof value !== "string" || !value) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(value);
-
-    if (url.protocol === "https:" || url.protocol === "http:") {
-      return value;
-    }
-  } catch {
-    return undefined;
-  }
-
-  return undefined;
-}
-
 // A product and its selected size identify a unique cart entry.
 function matchesItem(
   item: CartItem,
   menuItemId: string,
   selectedSize?: PizzaSize
 ): boolean {
-  return item.menuItemId === menuItemId && item.selectedSize === selectedSize;
+  return (
+    item.menuItemId === menuItemId.toLowerCase() &&
+    item.selectedSize === selectedSize
+  );
 }
 
 // Validate and normalize cart data before using it.
+// Legacy price and image properties are intentionally discarded.
 function normalizeCartItem(value: unknown): CartItem | null {
   if (typeof value !== "object" || value === null) {
     return null;
@@ -102,11 +100,7 @@ function normalizeCartItem(value: unknown): CartItem | null {
     typeof item.name !== "string" ||
     !item.name.trim() ||
     typeof item.quantity !== "number" ||
-    !isValidQuantity(item.quantity) ||
-    typeof item.unitPrice !== "number" ||
-    !Number.isFinite(item.unitPrice) ||
-    item.unitPrice < 0 ||
-    !Number.isFinite(item.unitPrice * item.quantity)
+    !isValidQuantity(item.quantity)
   ) {
     return null;
   }
@@ -116,12 +110,13 @@ function normalizeCartItem(value: unknown): CartItem | null {
   }
 
   return {
-    menuItemId: item.menuItemId,
+    menuItemId: item.menuItemId.toLowerCase(),
     name: item.name,
     selectedSize: item.selectedSize,
     quantity: item.quantity,
-    unitPrice: item.unitPrice,
-    imageUrl: getValidImageUrl(item.imageUrl)
+
+    // Previously stored items are selected by default.
+    selected: typeof item.selected === "boolean" ? item.selected : true
   };
 }
 
@@ -139,8 +134,9 @@ function parseCart(snapshot: string | null): CartItem[] {
     }
 
     const items: CartItem[] = [];
+    const seen = new Set<string>();
+
     let itemCount = 0;
-    let subtotal = 0;
 
     for (const value of stored) {
       const item = normalizeCartItem(value);
@@ -150,24 +146,22 @@ function parseCart(snapshot: string | null): CartItem[] {
       }
 
       // Ignore duplicate entries in malformed stored data.
-      const duplicate = items.some((existing) =>
-        matchesItem(existing, item.menuItemId, item.selectedSize)
-      );
+      const itemKey = getCartItemKey(item);
 
-      if (duplicate) {
+      if (seen.has(itemKey)) {
         continue;
       }
 
       const nextCount = itemCount + item.quantity;
-      const nextSubtotal = subtotal + item.unitPrice * item.quantity;
 
-      if (!Number.isSafeInteger(nextCount) || !Number.isFinite(nextSubtotal)) {
+      if (!Number.isSafeInteger(nextCount)) {
         continue;
       }
 
       items.push(item);
+      seen.add(itemKey);
+
       itemCount = nextCount;
-      subtotal = nextSubtotal;
     }
 
     return items;
@@ -176,31 +170,34 @@ function parseCart(snapshot: string | null): CartItem[] {
   }
 }
 
-// Calculate derived values from cart entries instead of storing them.
-function getTotals(items: CartItem[]) {
-  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
-
-  const subtotal = items.reduce(
-    (total, item) => total + item.unitPrice * item.quantity,
-    0
-  );
-
-  return { itemCount, subtotal };
+// Calculate the total number of cart units without storing a derived value.
+function getItemCount(items: CartItem[]): number {
+  return items.reduce((total, item) => total + item.quantity, 0);
 }
 
 // Persist the latest cart and notify subscribed components.
 function saveCart(items: CartItem[]): boolean {
-  const { itemCount, subtotal } = getTotals(items);
+  // Normalize all items before writing to prevent transient product
+  // prices, images or other properties from entering localStorage.
+  const normalizedItems = items.map(normalizeCartItem);
 
-  if (!Number.isSafeInteger(itemCount) || !Number.isFinite(subtotal)) {
+  if (normalizedItems.some((item) => item === null)) {
     return false;
   }
 
-  memorySnapshot = JSON.stringify(items);
+  const validItems = normalizedItems.filter(
+    (item): item is CartItem => item !== null
+  );
+
+  if (!Number.isSafeInteger(getItemCount(validItems))) {
+    return false;
+  }
+
+  memorySnapshot = JSON.stringify(validItems);
 
   if (!storageUnavailable) {
     try {
-      if (items.length === 0) {
+      if (validItems.length === 0) {
         window.localStorage.removeItem(CART_STORAGE_KEY);
       } else {
         window.localStorage.setItem(CART_STORAGE_KEY, memorySnapshot);
@@ -216,36 +213,15 @@ function saveCart(items: CartItem[]): boolean {
   return true;
 }
 
-// Resolve the current display price using the existing pricing model.
-export function getCartUnitPrice(
-  item: MenuItem,
-  selectedSize?: PizzaSize
-): number | undefined {
-  const usesVariants = VARIANT_CATEGORIES.includes(item.category);
+// Migrate existing cart records to the new selection-only format.
+function migrateStoredCart(): void {
+  const currentSnapshot = getSnapshot();
+  const items = parseCart(currentSnapshot);
+  const normalizedSnapshot = JSON.stringify(items);
 
-  let price: number | undefined;
-
-  if (usesVariants) {
-    if (!selectedSize || item.price != null) {
-      return undefined;
-    }
-
-    const variant = item.variants?.find(
-      (variant) => variant.size === selectedSize
-    );
-
-    price = variant?.price;
-  } else {
-    if (selectedSize !== undefined || item.variants?.length) {
-      return undefined;
-    }
-
-    price = item.price;
+  if (currentSnapshot !== normalizedSnapshot) {
+    saveCart(items);
   }
-
-  return typeof price === "number" && Number.isFinite(price) && price >= 0
-    ? price
-    : undefined;
 }
 
 function addItem(
@@ -257,6 +233,8 @@ function addItem(
     return false;
   }
 
+  // Validate the menu's current pricing configuration without
+  // persisting its monetary values.
   const unitPrice = getCartUnitPrice(item, selectedSize);
 
   if (unitPrice === undefined) {
@@ -268,11 +246,10 @@ function addItem(
     name: item.name,
     selectedSize,
     quantity,
-    unitPrice,
-    imageUrl: item.images[0]
+    selected: true
   });
 
-  if (!newItem) {
+  if (!newItem || getCartLineSubtotal(unitPrice, quantity) === undefined) {
     return false;
   }
 
@@ -286,11 +263,10 @@ function addItem(
   if (existingItem) {
     const updatedQuantity = existingItem.quantity + quantity;
 
-    if (!isValidQuantity(updatedQuantity)) {
-      return false;
-    }
-
-    if (!Number.isFinite(unitPrice * updatedQuantity)) {
+    if (
+      !isValidQuantity(updatedQuantity) ||
+      getCartLineSubtotal(unitPrice, updatedQuantity) === undefined
+    ) {
       return false;
     }
 
@@ -298,7 +274,10 @@ function addItem(
       matchesItem(entry, item._id, selectedSize)
         ? {
             ...newItem,
-            quantity: updatedQuantity
+            quantity: updatedQuantity,
+
+            // Preserve the customer's existing checkbox selection.
+            selected: entry.selected
           }
         : entry
     );
@@ -334,7 +313,7 @@ function updateQuantity(
     matchesItem(item, menuItemId, selectedSize)
   );
 
-  if (!existingItem || !Number.isFinite(existingItem.unitPrice * quantity)) {
+  if (!existingItem) {
     return false;
   }
 
@@ -343,6 +322,77 @@ function updateQuantity(
   );
 
   return saveCart(updatedItems);
+}
+
+// Update an individual cart entry's checkbox selection.
+function setItemSelected(
+  menuItemId: string,
+  selectedSize: PizzaSize | undefined,
+  selected: boolean
+): void {
+  const items = parseCart(getSnapshot());
+
+  const updatedItems = items.map((item) =>
+    matchesItem(item, menuItemId, selectedSize) ? { ...item, selected } : item
+  );
+
+  saveCart(updatedItems);
+}
+
+// Update several checkbox selections in a single storage operation.
+// The caller determines which items are currently eligible.
+function setItemsSelected(selectedItems: CartItem[], selected: boolean): void {
+  const items = parseCart(getSnapshot());
+
+  const keys = new Set(selectedItems.map(getCartItemKey));
+
+  const updatedItems = items.map((item) =>
+    keys.has(getCartItemKey(item)) ? { ...item, selected } : item
+  );
+
+  saveCart(updatedItems);
+}
+
+// Remove only quantities included in a successfully completed checkout.
+// Unselected items and additional quantities must remain in the cart.
+function removePurchasedItems(purchasedItems: PurchasedCartItem[]): void {
+  const purchasedQuantities = new Map<string, number>();
+
+  for (const item of purchasedItems) {
+    if (!isValidQuantity(item.quantity)) {
+      return;
+    }
+
+    const key = getCartItemKey({
+      menuItemId: item.menuItemId.toLowerCase(),
+      selectedSize: item.selectedSize
+    });
+
+    const quantity = (purchasedQuantities.get(key) ?? 0) + item.quantity;
+
+    if (!isValidQuantity(quantity)) {
+      return;
+    }
+
+    purchasedQuantities.set(key, quantity);
+  }
+
+  // Use the latest cart rather than the original checkout state.
+  const items = parseCart(getSnapshot());
+
+  const updatedItems = items
+    .map((item) => {
+      const purchasedQuantity =
+        purchasedQuantities.get(getCartItemKey(item)) ?? 0;
+
+      return {
+        ...item,
+        quantity: Math.max(0, item.quantity - purchasedQuantity)
+      };
+    })
+    .filter((item) => item.quantity > 0);
+
+  saveCart(updatedItems);
 }
 
 function clearCart(): void {
@@ -356,18 +406,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
     getServerSnapshot
   );
 
+  // Normalize legacy localStorage records after hydration.
+  // Read the latest storage snapshot to preserve recent cart changes.
+  useEffect(() => {
+    if (snapshot !== null) {
+      migrateStoredCart();
+    }
+  }, [snapshot]);
+
   const value = useMemo<CartContextType>(() => {
     const items = parseCart(snapshot);
-    const { itemCount, subtotal } = getTotals(items);
+    const itemCount = getItemCount(items);
 
     return {
       items,
       itemCount,
-      subtotal,
       isHydrated: snapshot !== null,
       addItem,
       removeItem,
       updateQuantity,
+      setItemSelected,
+      setItemsSelected,
+      removePurchasedItems,
       clearCart
     };
   }, [snapshot]);

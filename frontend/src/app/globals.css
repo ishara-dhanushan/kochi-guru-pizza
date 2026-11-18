@@ -84,6 +84,9 @@
 
   /* Subtle outlines */
   --edge: var(--color-black);
+
+  /* Scrollbar color */
+  --scrollbar: var(--color-orange-400);
 }
 
 /* Use the .dark class to apply dark mode variables */
@@ -148,6 +151,9 @@
 
   /* Subtle outlines */
   --edge: var(--color-white);
+
+  /* Scrollbar color */
+  --scrollbar: var(--color-orange-800);
 }
 
 @theme inline {
@@ -242,6 +248,9 @@
 
   /* Floating action button shadow */
   --shadow-floating: 0 8px 30px var(--color-black);
+
+  /* Scrollbar color */
+  --color-scrollbar: var(--scrollbar);
 }
 
 /* Apply dark variants when the dark class is active */
@@ -317,4 +326,12 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
+}
+
+/* Theme-aware scrollbars */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) transparent;
+  }
 }

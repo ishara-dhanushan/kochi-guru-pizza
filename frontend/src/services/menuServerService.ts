@@ -14,7 +14,10 @@ export async function fetchMenuItems(): Promise<MenuItem[]> {
       }
     );
 
-    const items: MenuItem[] = data.items ?? [];
+    // Only display currently available items on the public menu.
+    const items: MenuItem[] = (data.items ?? []).filter(
+      (item) => item.isAvailable === true
+    );
 
     console.info(`✅ Successfully fetched ${items.length} menu items`);
 
