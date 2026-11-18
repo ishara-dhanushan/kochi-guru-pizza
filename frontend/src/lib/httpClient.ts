@@ -10,7 +10,7 @@ const REFRESH_TOKEN_KEY = "kochi_refresh_token";
 // Share a single refresh request between concurrent HTTP requests.
 let refreshPromise: Promise<string> | null = null;
 
-const publicRoutes = ["/", "/menu", "/about", "/contact"];
+const publicRoutes = ["/", "/menu", "/about", "/contact", "/cart"];
 
 const isPublicRoute = (pathname: string) => {
   return publicRoutes.some(

@@ -5,6 +5,7 @@ import React from "react";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@contexts/AuthContext";
 import { ThemeProvider } from "@contexts/ThemeContext";
+import { CartProvider } from "@contexts/CartContext";
 import FloatingThemeToggle from "@components/FloatingThemeToggle";
 
 export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
@@ -13,7 +14,7 @@ export const AppProviders: React.FC<{ children: React.ReactNode }> = ({
   return (
     <ThemeProvider>
       <AuthProvider>
-        {children}
+        <CartProvider>{children}</CartProvider>
         <FloatingThemeToggle />
         <Toaster
           position="top-right"

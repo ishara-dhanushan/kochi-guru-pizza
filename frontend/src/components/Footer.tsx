@@ -57,7 +57,10 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-divider-inverse mt-8 pt-8 text-center text-content-on-dark-muted">
-          <p>&copy; 2025 Kochi Guru Pizza. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Kochi Guru Pizza. All rights
+            reserved.
+          </p>
         </div>
       </div>
     </footer>

@@ -13,11 +13,12 @@ import {
   useMotionValueEvent
 } from "framer-motion";
 import { useAuth } from "@contexts/AuthContext";
+import { useCart } from "@contexts/CartContext";
 import {
   Menu,
   X,
   User,
-  //ShoppingCart,
+  ShoppingCart,
   Clock,
   LayoutDashboard,
   LogOut,
@@ -38,10 +39,15 @@ const NavLinks = [
 const Header: React.FC = () => {
   const { user, logout, loading } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { itemCount, isHydrated } = useCart();
 
   const currentPathname = usePathname();
   // Normalize the homepage pathname after Vercel ISR regeneration.
   const pathname = currentPathname === "/index" ? "/" : currentPathname;
+
+  const cartIsActive = pathname === "/cart";
+  const showCartBadge = isHydrated && itemCount > 0;
+  const cartBadgeLabel = itemCount > 99 ? "99+" : itemCount;
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -148,7 +154,7 @@ const Header: React.FC = () => {
         initial={{ y: 0 }}
         animate={{ y: isVisible || mobileMenuOpen ? 0 : "-100%" }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed top-0 left-0 right-0 h-16 w-full z-50 bg-surface/75 backdrop-blur-lg border-b border-divider-standard/50 shadow-sm shadow-black/10"
+        className="fixed top-0 left-0 right-0 h-16 w-full z-50 bg-surface/75 backdrop-blur-lg border-b border-divider-standard/50 shadow-sm shadow-black/10 transition-colors"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -209,17 +215,30 @@ const Header: React.FC = () => {
                   </p>
                 </div>
               </div>
-              {/* <Link
+              {/* Shopping cart */}
+              <Link
                 href="/cart"
+                aria-label={`Cart, ${itemCount} items`}
+                aria-current={cartIsActive ? "page" : undefined}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 rounded-full border border-divider-standard/60 bg-surface-card/60 backdrop-blur px-3 py-2 shadow-sm"
+                className={`flex items-center gap-2 rounded-full border backdrop-blur px-3 py-2 shadow-sm transition-colors ${
+                  cartIsActive
+                    ? "border-brand bg-brand/10"
+                    : "border-divider-standard/60 bg-surface-card/60 hover:bg-surface-card-hover/75"
+                }`}
               >
                 <ShoppingCart className="w-5 h-5 text-brand" />
 
                 <span className="text-sm font-semibold text-content-main">
                   Cart
                 </span>
-              </Link> */}
+
+                {showCartBadge && (
+                  <span className="min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-brand text-brand-on text-[10px] font-bold">
+                    {cartBadgeLabel}
+                  </span>
+                )}
+              </Link>
 
               <div className="h-7 w-px bg-divider-standard/70" />
 
@@ -347,21 +366,44 @@ const Header: React.FC = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              ref={mobileMenuButtonRef}
-              onClick={() => {
-                setMobileMenuOpen(!mobileMenuOpen);
-                setIsThemeExpanded(false);
-              }}
-              className="md:hidden p-2 rounded-lg text-content-subtle hover:bg-surface-hover/75 transition-colors"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
+            {/* Mobile cart and navigation controls */}
+            <div className="flex items-center gap-1 md:hidden">
+              <Link
+                href="/cart"
+                aria-label={`Cart, ${itemCount} items`}
+                aria-current={cartIsActive ? "page" : undefined}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`relative p-2 rounded-lg transition-colors ${
+                  cartIsActive
+                    ? "bg-brand/10 text-brand"
+                    : "text-content-subtle hover:bg-surface-hover/75"
+                }`}
+              >
+                <ShoppingCart className="w-6 h-6" />
+
+                {showCartBadge && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-brand text-brand-on text-[10px] font-bold">
+                    {cartBadgeLabel}
+                  </span>
+                )}
+              </Link>
+
+              {/* Mobile Menu Button */}
+              <button
+                ref={mobileMenuButtonRef}
+                onClick={() => {
+                  setMobileMenuOpen(!mobileMenuOpen);
+                  setIsThemeExpanded(false);
+                }}
+                className="md:hidden p-2 rounded-lg text-content-subtle hover:bg-surface-hover/75 transition-colors"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </motion.header>
@@ -397,29 +439,6 @@ const Header: React.FC = () => {
                   </Link>
                 );
               })}
-
-              {/* Opening hours + Cart (mobile quick actions) */}
-              {/* <div className="px-4 pt-2">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 rounded-full border border-divider-standard/50 bg-surface-soft/25 px-3 py-2">
-                    <Clock className="w-4 h-4 text-brand" />
-                    <span className="text-sm font-semibold text-content-main">
-                      10AM - 10PM daily
-                    </span>
-                  </div>
-
-                  <Link
-                    href="/cart"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 rounded-xl border border-divider-standard/60 bg-surface-card/60 backdrop-blur px-3 py-2 hover:bg-surface-card-hover/75 transition-colors"
-                  >
-                    <ShoppingCart className="w-5 h-5 text-brand" />
-                    <span className="text-sm font-semibold text-content-main">
-                      Cart
-                    </span>
-                  </Link>
-                </div>
-              </div> */}
 
               <div className="h-px bg-divider-subtle my-4 mx-4" />
 
