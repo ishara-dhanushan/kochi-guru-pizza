@@ -1,52 +1,20 @@
 // src/components/HomeComponents/TrendingItems.tsx
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import { ShoppingCart } from "lucide-react";
+import { motion } from "framer-motion";
+import { MenuItem } from "@typings/menu";
+import MenuItemCard from "@components/MenuItemCard";
 import ScrollAnimatedList from "@components/ScrollAnimatedList";
 import ScrollAnimatedItem from "@components/ScrollAnimatedItem";
-import { motion } from "framer-motion";
 
-type TrendingItem = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-};
+interface TrendingItemsProps {
+  items: MenuItem[];
+}
 
-const trendingItems: TrendingItem[] = [
-  {
-    id: 1,
-    name: "Margherita Pizza",
-    price: 15.99,
-    //image: "/assets/images/trending/pizza.jpg"
-    image: "/assets/image-fallback.jpg"
-  },
-  {
-    id: 2,
-    name: "Loaded Burger",
-    price: 12.99,
-    //image: "/assets/images/trending/burger.jpg"
-    image: "/assets/image-fallback.jpg"
-  },
-  {
-    id: 3,
-    name: "Fresh Mango Juice",
-    price: 4.99,
-    //image: "/assets/images/trending/juice.jpg"
-    image: "/assets/image-fallback.jpg"
-  },
-  {
-    id: 4,
-    name: "Creamy Pasta",
-    price: 13.99,
-    //image: "/assets/images/trending/pasta.jpg"
-    image: "/assets/image-fallback.jpg"
-  }
-];
+export default function TrendingItems({ items }: TrendingItemsProps) {
+  // Hide the section when no selected menu items are available.
+  if (items.length === 0) return null;
 
-export default function TrendingItems() {
   return (
     <section className="py-20 md:py-24 bg-surface-alternate/30 dark:bg-surface-alternate transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,46 +36,10 @@ export default function TrendingItems() {
         </motion.div>
 
         {/* Grid */}
-        <ScrollAnimatedList className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {trendingItems.map((item) => (
-            <ScrollAnimatedItem
-              key={item.id}
-              className="group bg-surface-card rounded-xl shadow-md hover:shadow-xl transition-smooth overflow-hidden border border-divider-card gpu-fix"
-            >
-              {/* Image */}
-              <div className="relative h-48 bg-surface-placeholder overflow-hidden">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover transition-transform group-hover:scale-110"
-                  onError={(e) => {
-                    e.currentTarget.src = "/assets/image-fallback.jpg";
-                    e.currentTarget.srcset = "";
-                  }}
-                />
-              </div>
-
-              {/* Content */}
-              <div className="p-4">
-                <h3 className="font-heading text-lg font-semibold text-content-main mb-2 line-clamp-1">
-                  {item.name}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-xl font-bold text-brand">
-                    ${item.price.toFixed(2)}
-                  </span>
-                  <button
-                    className="flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-hover text-brand-on rounded-lg transition-colors"
-                    aria-label={`Add ${item.name} to cart`}
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    <span className="text-sm font-medium hidden sm:inline">
-                      Add
-                    </span>
-                  </button>
-                </div>
-              </div>
+        <ScrollAnimatedList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {items.map((item) => (
+            <ScrollAnimatedItem key={item._id} className="h-full">
+              <MenuItemCard item={item} />
             </ScrollAnimatedItem>
           ))}
         </ScrollAnimatedList>
