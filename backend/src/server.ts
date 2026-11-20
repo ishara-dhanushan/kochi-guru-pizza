@@ -8,8 +8,7 @@ import passport from "./config/passport";
 import authRoutes from "./routes/authRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import imageRoutes from "./routes/imageRoutes";
-
-connectDB();
+import orderRoutes from "./routes/orderRoutes";
 
 const app = express();
 const port = config.PORT;
@@ -32,10 +31,31 @@ app.use(express.urlencoded({ extended: true }));
 // Initialize Passport
 app.use(passport.initialize());
 
+// Ensure MongoDB is connected before processing API requests.
+// Existing connections are reused when the function instance is warm.
+app.use("/v1", async (_req, res, next) => {
+  try {
+    await connectDB();
+
+    next();
+  } catch (error) {
+    console.error(
+      "MongoDB connection error:",
+      error instanceof Error ? error.name : "Unknown error"
+    );
+
+    res.status(503).json({
+      error: "Database temporarily unavailable",
+      code: "DATABASE_UNAVAILABLE"
+    });
+  }
+});
+
 // Mount routes
 app.use("/v1/auth", authRoutes);
 app.use("/v1/menu", menuRoutes);
 app.use("/v1/images", imageRoutes);
+app.use("/v1/orders", orderRoutes);
 
 // Root route
 app.get("/", (req, res) => {
