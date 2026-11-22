@@ -140,9 +140,8 @@ async function connectTestDatabase(): Promise<void> {
       return;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      const transientDnsError = /\b(?:ENOTFOUND|EAI_AGAIN|ETIMEOUT|ESERVFAIL)\b/.test(
-        message
-      );
+      const transientDnsError =
+        /\b(?:ENOTFOUND|EAI_AGAIN|ETIMEOUT|ESERVFAIL)\b/.test(message);
 
       if (!transientDnsError || attempt === maxAttempts) {
         throw error;

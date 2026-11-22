@@ -60,10 +60,7 @@ describe("Order routes — MongoDB integration", () => {
     };
   }
 
-  function sendCreateOrder(
-    token: string,
-    payload = makePayload()
-  ) {
+  function sendCreateOrder(token: string, payload = makePayload()) {
     return request(app)
       .post("/v1/orders")
       .set("Authorization", `Bearer ${token}`)
@@ -78,9 +75,7 @@ describe("Order routes — MongoDB integration", () => {
 
   describe("POST /v1/orders", () => {
     it("creates an order using server-side prices", async () => {
-      const response = await sendCreateOrder(
-        getFixtures().customerToken
-      );
+      const response = await sendCreateOrder(getFixtures().customerToken);
 
       expect(response.status).toBe(201);
       expect(response.body.order.total).toBe(6000);
@@ -127,19 +122,16 @@ describe("Order routes — MongoDB integration", () => {
     it("rejects changed order data with the same idempotency key", async () => {
       const payload = makePayload();
       const first = await sendCreateOrder(getFixtures().customerToken, payload);
-      const changed = await sendCreateOrder(
-        getFixtures().customerToken,
-        {
-          ...payload,
-          items: [
-            {
-              menuItemId: getFixtures().pizzaId.toString(),
-              selectedSize: "large",
-              qty: 1
-            }
-          ]
-        }
-      );
+      const changed = await sendCreateOrder(getFixtures().customerToken, {
+        ...payload,
+        items: [
+          {
+            menuItemId: getFixtures().pizzaId.toString(),
+            selectedSize: "large",
+            qty: 1
+          }
+        ]
+      });
 
       expect(first.status).toBe(201);
       expect(changed.status).toBe(409);

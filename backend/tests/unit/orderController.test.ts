@@ -18,11 +18,13 @@ jest.mock("@services/orderService", () => ({
 
 const testUserId = "699bee908b3c7b09a0bcb84f";
 
-function makeHttpContext(options: {
-  body?: unknown;
-  query?: Record<string, string>;
-  params?: Record<string, string>;
-} = {}) {
+function makeHttpContext(
+  options: {
+    body?: unknown;
+    query?: Record<string, string>;
+    params?: Record<string, string>;
+  } = {}
+) {
   const req = {
     user: { _id: testUserId },
     body: options.body ?? {},
@@ -62,10 +64,7 @@ describe("OrderController", () => {
     const { req, res } = makeHttpContext({ body: { items: [] } });
     await orderController.createOrder(req, res);
 
-    expect(orderService.createOrder).toHaveBeenCalledWith(
-      testUserId,
-      req.body
-    );
+    expect(orderService.createOrder).toHaveBeenCalledWith(testUserId, req.body);
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ replayed: false })
@@ -122,9 +121,11 @@ describe("OrderController", () => {
   });
 
   it("returns structured errors from order service", async () => {
-    jest.mocked(orderService.createOrder).mockRejectedValue(
-      new OrderError(409, "IDEMPOTENCY_CONFLICT", "Different request")
-    );
+    jest
+      .mocked(orderService.createOrder)
+      .mockRejectedValue(
+        new OrderError(409, "IDEMPOTENCY_CONFLICT", "Different request")
+      );
 
     const { req, res } = makeHttpContext();
     await orderController.createOrder(req, res);

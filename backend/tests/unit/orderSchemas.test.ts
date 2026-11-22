@@ -18,9 +18,9 @@ const validBody = {
 describe("Order request validation", () => {
   describe("createOrderSchema", () => {
     it("accepts valid checkout input", () => {
-      expect(
-        createOrderSchema.safeParse({ body: validBody }).success
-      ).toBe(true);
+      expect(createOrderSchema.safeParse({ body: validBody }).success).toBe(
+        true
+      );
     });
 
     it("rejects client-supplied totals", () => {
@@ -79,9 +79,9 @@ describe("Order request validation", () => {
     });
 
     it("rejects invalid pages", () => {
-      expect(
-        listOrdersQuerySchema.safeParse({ page: "0" }).success
-      ).toBe(false);
+      expect(listOrdersQuerySchema.safeParse({ page: "0" }).success).toBe(
+        false
+      );
     });
   });
 

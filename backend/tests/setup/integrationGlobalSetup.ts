@@ -33,9 +33,8 @@ export default async function integrationGlobalSetup(): Promise<void> {
       return;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      const transientDnsError = /\b(?:ENOTFOUND|EAI_AGAIN|ETIMEOUT|ESERVFAIL)\b/.test(
-        message
-      );
+      const transientDnsError =
+        /\b(?:ENOTFOUND|EAI_AGAIN|ETIMEOUT|ESERVFAIL)\b/.test(message);
 
       // Fail immediately for authentication, permission and other errors.
       if (!transientDnsError || attempt === maxAttempts) {

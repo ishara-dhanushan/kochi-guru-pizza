@@ -68,14 +68,16 @@ describe("OrderService", () => {
   beforeEach(() => {
     // Avoid live MongoDB calls in unit tests. These spies are restored by Jest.
     jest.spyOn(Order, "createIndexes").mockResolvedValue([] as never);
-    jest.spyOn(Order, "findOne").mockImplementation(
-      () => ({ select: () => Promise.resolve(null) }) as never
-    );
+    jest
+      .spyOn(Order, "findOne")
+      .mockImplementation(
+        () => ({ select: () => Promise.resolve(null) }) as never
+      );
     jest.spyOn(Order, "create").mockResolvedValue(storedOrder() as never);
     jest.spyOn(Order, "findById").mockResolvedValue(storedOrder() as never);
-    jest.spyOn(Order, "findOneAndUpdate").mockResolvedValue(
-      storedOrder({ status: "confirmed" }) as never
-    );
+    jest
+      .spyOn(Order, "findOneAndUpdate")
+      .mockResolvedValue(storedOrder({ status: "confirmed" }) as never);
 
     jest.mocked(getOrderPricing).mockReset();
     jest.mocked(getOrderPricing).mockResolvedValue({
@@ -104,10 +106,7 @@ describe("OrderService", () => {
     it("ignores cart item ordering", () => {
       const input: CreateOrderInput = {
         ...orderInput,
-        items: [
-          { menuItemId: userId, qty: 1 },
-          ...orderInput.items
-        ]
+        items: [{ menuItemId: userId, qty: 1 }, ...orderInput.items]
       };
 
       expect(getRequestHash(input)).toBe(
@@ -152,9 +151,11 @@ describe("OrderService", () => {
 
     it("returns an existing order for an identical retry", async () => {
       const existing = storedOrder();
-      jest.spyOn(Order, "findOne").mockImplementation(
-        () => ({ select: () => Promise.resolve(existing) }) as never
-      );
+      jest
+        .spyOn(Order, "findOne")
+        .mockImplementation(
+          () => ({ select: () => Promise.resolve(existing) }) as never
+        );
 
       const result = await createOrder(userId, orderInput);
 
@@ -165,9 +166,11 @@ describe("OrderService", () => {
 
     it("rejects changed contents for an existing key", async () => {
       const existing = storedOrder({ requestHash: "different-hash" });
-      jest.spyOn(Order, "findOne").mockImplementation(
-        () => ({ select: () => Promise.resolve(existing) }) as never
-      );
+      jest
+        .spyOn(Order, "findOne")
+        .mockImplementation(
+          () => ({ select: () => Promise.resolve(existing) }) as never
+        );
 
       await expect(createOrder(userId, orderInput)).rejects.toMatchObject({
         statusCode: 409,
