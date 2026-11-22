@@ -1,10 +1,6 @@
 // src/schemas/orderSchemas.ts
 import { z } from "zod";
-import {
-  DELIVERY_TYPES,
-  ORDER_STATUSES,
-  PAYMENT_METHODS
-} from "../models/Order";
+import { DELIVERY_TYPES, ORDER_STATUSES, PAYMENT_METHODS } from "@models/Order";
 
 const objectIdSchema = z
   .string()

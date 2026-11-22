@@ -1,6 +1,6 @@
 // src/middleware/authorize.ts
 import { Request, Response, NextFunction } from "express";
-import { IUser } from "../models/User";
+import { IUser } from "@models/User";
 
 /**
  * Middleware factory to check if user has required role

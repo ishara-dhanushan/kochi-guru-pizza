@@ -1,16 +1,16 @@
 // src/routes/authRoutes.ts
 import { Router } from "express";
 import passport from "passport";
-import * as authController from "../controllers/authController";
-import { authenticate } from "../middleware/authenticate";
-import config from "../config";
-import { validateRequest } from "../middleware/validateRequest";
+import * as authController from "@controllers/authController";
+import { authenticate } from "@middleware/authenticate";
+import config from "@config/index";
+import { validateRequest } from "@middleware/validateRequest";
 import {
   registerSchema,
   loginSchema,
   refreshTokenSchema,
   logoutSchema
-} from "../schemas/authSchemas";
+} from "@schemas/authSchemas";
 
 const router = Router();
 

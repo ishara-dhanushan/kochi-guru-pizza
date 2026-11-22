@@ -40,8 +40,7 @@ const UserSchema = new Schema<IUser>(
       default: "local"
     },
     googleId: {
-      type: String,
-      default: null
+      type: String
     },
     role: {
       type: String,

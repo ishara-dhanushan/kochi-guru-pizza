@@ -1,6 +1,6 @@
 // src/models/Order.ts
 import mongoose, { Schema, Document, Types } from "mongoose";
-import type { PizzaSize } from "./MenuItem";
+import type { PizzaSize } from "@models/MenuItem";
 
 export const ORDER_STATUSES = [
   "pending",

@@ -3,8 +3,8 @@ import {
   uploadToR2,
   deleteFromR2,
   reconcileStorage
-} from "../services/r2Service";
-import MenuItem from "../models/MenuItem";
+} from "@services/r2Service";
+import MenuItem from "@models/MenuItem";
 
 export const uploadImage = async (req: Request, res: Response) => {
   try {

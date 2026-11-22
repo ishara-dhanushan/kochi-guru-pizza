@@ -1,12 +1,12 @@
 import { Router } from "express";
 import multer from "multer";
-import { authenticate } from "../middleware/authenticate";
-import { authorize } from "../middleware/authorize";
+import { authenticate } from "@middleware/authenticate";
+import { authorize } from "@middleware/authorize";
 import {
   uploadImage,
   deleteImage,
   reconcileImages
-} from "../controllers/imageController";
+} from "@controllers/imageController";
 
 const router = Router();
 

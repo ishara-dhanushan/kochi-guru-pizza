@@ -1,16 +1,16 @@
 // src/routes/menuRoutes.ts
 import { Router } from "express";
-import * as menuController from "../controllers/menuController";
-import { authenticate } from "../middleware/authenticate";
-import { authorize } from "../middleware/authorize";
-import { validateRequest } from "../middleware/validateRequest";
+import * as menuController from "@controllers/menuController";
+import { authenticate } from "@middleware/authenticate";
+import { authorize } from "@middleware/authorize";
+import { validateRequest } from "@middleware/validateRequest";
 import {
   createMenuItemSchema,
   updateMenuItemSchema,
   getMenuItemSchema,
   deleteMenuItemSchema,
   listMenuItemsSchema
-} from "../schemas/menuSchemas";
+} from "@schemas/menuSchemas";
 
 const router = Router();
 

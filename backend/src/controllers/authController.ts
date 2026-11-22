@@ -1,9 +1,9 @@
 // src/controllers/authController.ts
 import { Request, Response } from "express";
-import User, { IUser } from "../models/User";
-import { hashPassword, comparePassword } from "../utils/passwordUtils";
+import User, { IUser } from "@models/User";
+import { hashPassword, comparePassword } from "@utils/passwordUtils";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
-import config from "../config";
+import config from "@config/index";
 
 /**
  * Generate JWT access token

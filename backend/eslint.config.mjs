@@ -7,5 +7,10 @@ export default [
   { files: ["**/*.{js,mjs,cjs,ts}"] },
   { languageOptions: { globals: globals.node } },
   pluginJs.configs.recommended,
-  ...tseslint.configs.recommended
+  ...tseslint.configs.recommended,
+  // SWC hoists global jest.mock calls before imports in these test files.
+  {
+    files: ["tests/**/*.ts"],
+    languageOptions: { globals: globals.jest }
+  }
 ];

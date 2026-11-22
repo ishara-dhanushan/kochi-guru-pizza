@@ -1,6 +1,6 @@
 // src/controllers/menuController.ts
 import { Request, Response } from "express";
-import MenuItem from "../models/MenuItem";
+import MenuItem from "@models/MenuItem";
 
 /**
  * GET /v1/menu

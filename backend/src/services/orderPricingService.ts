@@ -1,9 +1,9 @@
 // src/services/orderPricingService.ts
-import MenuItem from "../models/MenuItem";
-import type { IMenuItem, PizzaSize } from "../models/MenuItem";
-import type { DeliveryType } from "../models/Order";
-import type { OrderItemInput } from "../schemas/orderSchemas";
-import { OrderError } from "../utils/OrderError";
+import MenuItem from "@models/MenuItem";
+import type { IMenuItem, PizzaSize } from "@models/MenuItem";
+import type { DeliveryType } from "@models/Order";
+import type { OrderItemInput } from "@schemas/orderSchemas";
+import { OrderError } from "@utils/OrderError";
 
 export type PricingMenuItem = Pick<
   IMenuItem,

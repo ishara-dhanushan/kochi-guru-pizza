@@ -5,6 +5,7 @@ dotenv.config();
 const {
   PORT,
   MONGO_DB_URI,
+  MONGO_DB_URI_TEST,
   FRONTEND_URL,
   JWT_SECRET,
   JWT_EXPIRES_IN,
@@ -21,9 +22,18 @@ const {
   R2_BUCKET_NAME
 } = process.env;
 
+// Integration tests must use the dedicated database.
+const isTestEnvironment = NODE_ENV === "test";
+
+const activeMongoDbUri = isTestEnvironment ? MONGO_DB_URI_TEST : MONGO_DB_URI;
+
+const requiredMongoDbVariable = isTestEnvironment
+  ? "MONGO_DB_URI_TEST"
+  : "MONGO_DB_URI";
+
 // Validate required environment variables
 const requiredEnvVars = [
-  "MONGO_DB_URI",
+  requiredMongoDbVariable,
   "FRONTEND_URL",
   "JWT_SECRET",
   "REFRESH_TOKEN_SECRET",
@@ -43,6 +53,36 @@ if (missingEnvVars.length > 0) {
   throw new Error(
     `Missing required environment variables: ${missingEnvVars.join(", ")}`
   );
+}
+
+/**
+ * Prevent integration tests from accessing an unintended database.
+ * The test connection must always target the dedicated test database.
+ */
+if (isTestEnvironment && activeMongoDbUri) {
+  const testUri = new URL(activeMongoDbUri);
+
+  if (
+    !["mongodb:", "mongodb+srv:"].includes(testUri.protocol) ||
+    testUri.pathname !== "/kochi_guru_pizza_test"
+  ) {
+    throw new Error(
+      "MONGO_DB_URI_TEST must target the kochi_guru_pizza_test database"
+    );
+  }
+
+  // Prevent connecting to the application database using
+  // different credentials for the same database.
+  if (MONGO_DB_URI) {
+    const applicationUri = new URL(MONGO_DB_URI);
+
+    if (
+      applicationUri.hostname === testUri.hostname &&
+      applicationUri.pathname === testUri.pathname
+    ) {
+      throw new Error("Integration tests cannot use the application database");
+    }
+  }
 }
 
 interface Config {
@@ -67,7 +107,7 @@ interface Config {
 
 const config: Config = {
   PORT: PORT ? Number(PORT) : 5000,
-  MONGO_DB_URI: MONGO_DB_URI as string,
+  MONGO_DB_URI: activeMongoDbUri as string,
   FRONTEND_URL: FRONTEND_URL as string,
   JWT_SECRET: JWT_SECRET as string,
   JWT_EXPIRES_IN: JWT_EXPIRES_IN || "1d",

@@ -1,13 +1,13 @@
 // src/routes/orderRoutes.ts
 import { Router } from "express";
-import * as orderController from "../controllers/orderController";
-import { authenticate } from "../middleware/authenticate";
-import { authorize } from "../middleware/authorize";
-import { validateRequest } from "../middleware/validateRequest";
+import * as orderController from "@controllers/orderController";
+import { authenticate } from "@middleware/authenticate";
+import { authorize } from "@middleware/authorize";
+import { validateRequest } from "@middleware/validateRequest";
 import {
   createOrderSchema,
   updateOrderStatusSchema
-} from "../schemas/orderSchemas";
+} from "@schemas/orderSchemas";
 
 const router = Router();
 

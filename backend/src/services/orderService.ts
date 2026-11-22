@@ -1,14 +1,15 @@
 // src/services/orderService.ts
 import { createHash } from "node:crypto";
 import { Types } from "mongoose";
-import Order from "../models/Order";
-import type { IOrder, OrderStatus } from "../models/Order";
-import type {
-  CreateOrderInput,
-  ListOrdersQuery
-} from "../schemas/orderSchemas";
-import { getOrderPricing } from "./orderPricingService";
-import { OrderError } from "../utils/OrderError";
+import Order from "@models/Order";
+import type { IOrder, OrderStatus } from "@models/Order";
+import type { CreateOrderInput, ListOrdersQuery } from "@schemas/orderSchemas";
+import { getOrderPricing } from "@services/orderPricingService";
+import { OrderError } from "@utils/OrderError";
+import {
+  isRetryableMongoConflict,
+  withMongoConflictRetry
+} from "@utils/mongoConflictRetry";
 
 // Initial order status transition policy.
 // Confirm cancellation and fulfilment rules before production launch.
@@ -137,7 +138,7 @@ function isDuplicateKeyError(error: unknown): boolean {
 }
 
 // Create an order using authoritative database prices.
-export async function createOrder(userId: string, input: CreateOrderInput) {
+async function createOrderOnce(userId: string, input: CreateOrderInput) {
   await ensureOrderIndexes();
 
   const requestHash = getRequestHash(input);
@@ -210,6 +211,24 @@ export async function createOrder(userId: string, input: CreateOrderInput) {
   }
 }
 
+// Retry transient write conflicts without weakening the existing
+// checkout idempotency and authoritative pricing checks.
+export async function createOrder(userId: string, input: CreateOrderInput) {
+  try {
+    return await withMongoConflictRetry(() => createOrderOnce(userId, input));
+  } catch (error) {
+    if (isRetryableMongoConflict(error)) {
+      throw new OrderError(
+        409,
+        "ORDER_CONCURRENCY_CONFLICT",
+        "Order creation encountered repeated database conflicts. Please retry."
+      );
+    }
+
+    throw error;
+  }
+}
+
 // Retrieve paginated orders, optionally restricted to one user.
 export async function listOrders(query: ListOrdersQuery, userId?: string) {
   const filter = {
@@ -243,10 +262,7 @@ export async function listOrders(query: ListOrdersQuery, userId?: string) {
 }
 
 // Update order status using controlled state transitions.
-export async function updateOrderStatus(
-  orderId: string,
-  nextStatus: OrderStatus
-) {
+async function updateOrderStatusOnce(orderId: string, nextStatus: OrderStatus) {
   const order = await Order.findById(orderId);
 
   if (!order) {
@@ -321,4 +337,27 @@ export async function updateOrderStatus(
   }
 
   return updatedOrder;
+}
+
+// Re-read and revalidate order state after a transient write conflict.
+// Business errors such as ORDER_STATE_CHANGED are not retried.
+export async function updateOrderStatus(
+  orderId: string,
+  nextStatus: OrderStatus
+) {
+  try {
+    return await withMongoConflictRetry(() =>
+      updateOrderStatusOnce(orderId, nextStatus)
+    );
+  } catch (error) {
+    if (isRetryableMongoConflict(error)) {
+      throw new OrderError(
+        409,
+        "ORDER_CONCURRENCY_CONFLICT",
+        "The order encountered repeated database conflicts. Please retry."
+      );
+    }
+
+    throw error;
+  }
 }

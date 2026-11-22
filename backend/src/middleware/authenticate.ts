@@ -1,7 +1,7 @@
 // src/middleware/authenticate.ts
 import { Request, Response, NextFunction } from "express";
 import passport from "passport";
-import { IUser } from "../models/User";
+import { IUser } from "@models/User";
 
 /**
  * Middleware to authenticate requests using JWT

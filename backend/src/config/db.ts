@@ -1,6 +1,6 @@
 // src/config/db.ts
 import mongoose from "mongoose";
-import config from "./index";
+import config from "@config/index";
 
 // Share an in-progress connection between concurrent requests.
 let connectionPromise: Promise<typeof mongoose> | null = null;

@@ -50,6 +50,13 @@ jobs:
 
   backend-check:
     runs-on: ubuntu-latest
+
+    # Prevent overlapping workflow runs from using the shared test database.
+    # Within this job Jest can still use three integration workers.
+    concurrency:
+      group: kochi-backend-test-database
+      cancel-in-progress: false
+
     defaults:
       run:
         working-directory: ./backend
@@ -75,6 +82,35 @@ jobs:
 
       - name: Build Express app
         run: npm run build
+
+      - name: Type-check backend tests
+        run: npm run test:typecheck
+
+      - name: Run unit tests with coverage
+        run: npm run test:unit:coverage
+
+      - name: Run integration tests with coverage
+        run: npm run test:integration:coverage
+        env:
+          # No dummy Google/R2/JWT environment variables.
+          # The order suite mocks provider dependencies and test config locally.
+          MONGO_DB_URI_TEST: ${{ secrets.MONGO_DB_URI_TEST }}
+
+      - name: Upload unit coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-unit-coverage
+          path: backend/coverage/unit/
+          if-no-files-found: ignore
+
+      - name: Upload integration coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-integration-coverage
+          path: backend/coverage/integration/
+          if-no-files-found: ignore
 
       - name: Audit dependencies
         run: npm audit

@@ -4,8 +4,8 @@ import {
   DeleteObjectCommand,
   ListObjectsV2Command
 } from "@aws-sdk/client-s3";
-import MenuItem, { IMenuItem } from "../models/MenuItem";
-import config from "../config";
+import MenuItem, { IMenuItem } from "@models/MenuItem";
+import config from "@config/index";
 import dotenv from "dotenv";
 
 dotenv.config();

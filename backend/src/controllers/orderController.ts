@@ -1,14 +1,14 @@
 // src/controllers/orderController.ts
 import { Request, Response } from "express";
 import { ZodError } from "zod";
-import type { IUser } from "../models/User";
-import type { OrderStatus } from "../models/Order";
+import type { IUser } from "@models/User";
+import type { OrderStatus } from "@models/Order";
 import {
   listOrdersQuerySchema,
   type CreateOrderInput
-} from "../schemas/orderSchemas";
-import * as orderService from "../services/orderService";
-import { OrderError } from "../utils/OrderError";
+} from "@schemas/orderSchemas";
+import * as orderService from "@services/orderService";
+import { OrderError } from "@utils/OrderError";
 
 // Convert service errors into appropriate HTTP responses.
 function handleOrderError(
