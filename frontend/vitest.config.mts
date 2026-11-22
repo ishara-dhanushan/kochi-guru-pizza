@@ -31,6 +31,8 @@ export default defineConfig({
     // Unit test commands override this limit to six workers.
     maxWorkers: 3,
 
+    reporters: ["default"],
+
     // Browser-like environment for React component testing.
     environment: "jsdom",
     environmentOptions: {

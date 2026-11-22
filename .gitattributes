@@ -1,1 +1,6 @@
 * text=auto eol=lf
+
+# Suppress verbose npm lockfile diffs while keeping files tracked.
+frontend/package-lock.json -diff
+backend/package-lock.json -diff
+tests/package-lock.json -diff

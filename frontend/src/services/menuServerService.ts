@@ -7,11 +7,12 @@ import { httpServerClient } from "@lib/httpServerClient";
  */
 export async function fetchMenuItems(): Promise<MenuItem[]> {
   try {
+    // Test fixtures change menu data between runs, so E2E requests must bypass caching.
     const data = await httpServerClient<MenuListResponse>(
       "/menu?isAvailable=true",
-      {
-        next: { revalidate: 60 }
-      }
+      process.env.E2E_TEST_MODE === "true"
+        ? { cache: "no-store" }
+        : { next: { revalidate: 60 } }
     );
 
     // Only display currently available items on the public menu.

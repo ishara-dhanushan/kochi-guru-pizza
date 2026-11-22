@@ -6,6 +6,7 @@ const {
   PORT,
   MONGO_DB_URI,
   MONGO_DB_URI_TEST,
+  MONGO_DB_URI_E2E,
   FRONTEND_URL,
   JWT_SECRET,
   JWT_EXPIRES_IN,
@@ -22,14 +23,21 @@ const {
   R2_BUCKET_NAME
 } = process.env;
 
-// Integration tests must use the dedicated database.
+// Automated tests must use dedicated databases, never the application database.
 const isTestEnvironment = NODE_ENV === "test";
+const isE2eEnvironment = NODE_ENV === "e2e";
 
-const activeMongoDbUri = isTestEnvironment ? MONGO_DB_URI_TEST : MONGO_DB_URI;
+const activeMongoDbUri = isE2eEnvironment
+  ? MONGO_DB_URI_E2E
+  : isTestEnvironment
+    ? MONGO_DB_URI_TEST
+    : MONGO_DB_URI;
 
-const requiredMongoDbVariable = isTestEnvironment
-  ? "MONGO_DB_URI_TEST"
-  : "MONGO_DB_URI";
+const requiredMongoDbVariable = isE2eEnvironment
+  ? "MONGO_DB_URI_E2E"
+  : isTestEnvironment
+    ? "MONGO_DB_URI_TEST"
+    : "MONGO_DB_URI";
 
 // Validate required environment variables
 const requiredEnvVars = [
@@ -55,10 +63,8 @@ if (missingEnvVars.length > 0) {
   );
 }
 
-/**
- * Prevent integration tests from accessing an unintended database.
- * The test connection must always target the dedicated test database.
- */
+// Prevent integration tests from accessing an unintended database.
+// The test connection must always target the dedicated test database.
 if (isTestEnvironment && activeMongoDbUri) {
   const testUri = new URL(activeMongoDbUri);
 
@@ -81,6 +87,38 @@ if (isTestEnvironment && activeMongoDbUri) {
       applicationUri.pathname === testUri.pathname
     ) {
       throw new Error("Integration tests cannot use the application database");
+    }
+  }
+}
+
+// Restrict browser tests to the dedicated E2E database.
+if (isE2eEnvironment && activeMongoDbUri) {
+  const e2eUri = new URL(activeMongoDbUri);
+
+  if (
+    !["mongodb:", "mongodb+srv:"].includes(e2eUri.protocol) ||
+    e2eUri.pathname !== "/kochi_guru_pizza_e2e"
+  ) {
+    throw new Error(
+      "MONGO_DB_URI_E2E must target the kochi_guru_pizza_e2e database"
+    );
+  }
+
+  // Prevent accidentally reusing the application or Jest database.
+  for (const otherUri of [MONGO_DB_URI, MONGO_DB_URI_TEST]) {
+    if (!otherUri) {
+      continue;
+    }
+
+    const parsed = new URL(otherUri);
+
+    if (
+      parsed.hostname === e2eUri.hostname &&
+      parsed.pathname === e2eUri.pathname
+    ) {
+      throw new Error(
+        "E2E tests cannot share the application or Jest test database"
+      );
     }
   }
 }
