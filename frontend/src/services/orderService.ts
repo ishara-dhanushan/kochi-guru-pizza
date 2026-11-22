@@ -1,6 +1,11 @@
 // src/services/orderService.ts
 import { httpClient } from "@lib/httpClient";
-import type { CreateOrderPayload, CreateOrderResponse } from "@typings/order";
+import type {
+  CreateOrderPayload,
+  CreateOrderResponse,
+  ListMyOrdersResponse,
+  MyOrdersQuery
+} from "@typings/order";
 
 export const createOrder = (
   payload: CreateOrderPayload
@@ -12,6 +17,26 @@ export const createOrder = (
   });
 };
 
+export const getMyOrders = ({
+  page = 1,
+  limit = 10,
+  status
+}: MyOrdersQuery = {}): Promise<ListMyOrdersResponse> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit)
+  });
+
+  if (status) {
+    params.set("status", status);
+  }
+
+  return httpClient<ListMyOrdersResponse>(`/orders/me?${params.toString()}`, {
+    cache: "no-store"
+  });
+};
+
 export const orderService = {
-  createOrder
+  createOrder,
+  getMyOrders
 };

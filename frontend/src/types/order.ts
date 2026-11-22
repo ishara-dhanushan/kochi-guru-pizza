@@ -67,3 +67,21 @@ export interface CreateOrderResponse {
   order: OrderRecord;
   replayed: boolean;
 }
+
+export interface OrderPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ListMyOrdersResponse {
+  orders: OrderRecord[];
+  pagination: OrderPagination;
+}
+
+export interface MyOrdersQuery {
+  page?: number;
+  limit?: number;
+  status?: OrderStatus;
+}

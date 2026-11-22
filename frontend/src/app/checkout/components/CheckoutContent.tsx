@@ -464,12 +464,21 @@ export default function CheckoutContent() {
               The final amount is taken from the order saved by the backend.
             </p>
 
-            <Link
-              href="/menu"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 mt-8 rounded-xl bg-brand hover:bg-brand-hover text-brand-on font-semibold transition-colors"
-            >
-              Continue Shopping
-            </Link>
+            <div className="flex flex-wrap gap-3 mt-8">
+              <Link
+                href="/orders"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand hover:bg-brand-hover text-brand-on font-semibold transition-colors"
+              >
+                View My Orders
+              </Link>
+
+              <Link
+                href="/menu"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-divider-control text-content-main hover:bg-surface-soft font-semibold transition-colors"
+              >
+                Continue Shopping
+              </Link>
+            </div>
           </div>
         </div>
       </section>

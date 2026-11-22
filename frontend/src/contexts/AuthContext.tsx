@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       toast.success("Logged out successfully");
     } catch (error: unknown) {
       console.error("Logout error:", error);
-      toast.error("You have been signed out.");
+      toast.success("You have been signed out.");
     } finally {
       setUser(null);
       router.replace("/");

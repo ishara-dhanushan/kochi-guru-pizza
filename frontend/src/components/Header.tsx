@@ -305,14 +305,14 @@ const Header: React.FC = () => {
                                 </p>
                               </div>
 
-                              {/* <Link
+                              <Link
                                 href="/orders"
                                 onClick={() => setDropdownOpen(false)}
                                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-content-subtle hover:bg-brand/10 hover:text-brand transition-colors"
                               >
                                 <ShoppingCart className="w-4 h-4" />
                                 My Orders
-                              </Link> */}
+                              </Link>
 
                               {(user.role === "admin" ||
                                 user.role === "staff") && (
@@ -470,13 +470,14 @@ const Header: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* <Link
+                    <Link
                       href="/orders"
+                      onClick={() => setMobileMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 text-base font-medium text-content-subtle hover:bg-brand/10 hover:text-brand rounded-xl transition-colors"
                     >
                       <ShoppingCart className="w-5 h-5" />
                       My Orders
-                    </Link> */}
+                    </Link>
 
                     {(user.role === "admin" || user.role === "staff") && (
                       <Link
