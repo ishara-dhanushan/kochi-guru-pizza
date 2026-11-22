@@ -4,6 +4,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   AlertCircle,
   ArrowLeft,
@@ -77,6 +78,8 @@ function getAvailabilityMessage(status?: CartItemStatus): string | undefined {
 
 // Mount the menu-fetching hook only when the cart contains items.
 function CartItemsContent() {
+  const router = useRouter();
+
   const {
     items,
     removeItem,
@@ -425,11 +428,16 @@ function CartItemsContent() {
           items will remain in your cart.
         </p>
 
-        {/* Checkout will be enabled when the order workflow is implemented. */}
+        {/* Proceed only when selected items have valid current prices. */}
         <button
           type="button"
-          disabled
-          className="w-full flex items-center justify-center gap-2 px-5 py-3.5 mt-6 rounded-xl bg-brand text-brand-on font-semibold opacity-50 cursor-not-allowed"
+          onClick={() => router.push("/checkout")}
+          disabled={!checkoutReady}
+          className={`w-full flex items-center justify-center gap-2 px-5 py-3.5 mt-6 rounded-xl bg-brand text-brand-on font-semibold transition-colors ${
+            checkoutReady
+              ? "hover:bg-brand-hover"
+              : "opacity-50 cursor-not-allowed"
+          }`}
         >
           Proceed to Checkout
           {selectedItemCount > 0 && <span>({selectedItemCount})</span>}
@@ -445,7 +453,7 @@ function CartItemsContent() {
                 ? "Select available items to continue."
                 : !checkoutReady
                   ? "Unable to calculate the selected items total."
-                  : "Checkout is not available yet."}
+                  : "Review your order details before placing your order."}
         </p>
 
         <Link

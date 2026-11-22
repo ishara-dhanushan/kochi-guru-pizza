@@ -4,6 +4,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@contexts/AuthContext";
+import { saveAuthReturnTo } from "@lib/authRedirect";
 import toast from "react-hot-toast";
 
 interface DashboardGuardProps {
@@ -18,6 +19,8 @@ export default function DashboardGuard({ children }: DashboardGuardProps) {
     if (loading) return;
 
     if (!user) {
+      saveAuthReturnTo(window.location.pathname + window.location.search);
+
       router.replace("/login");
       return;
     }

@@ -49,5 +49,5 @@ module.exports = {
 
   coverageProvider: "v8",
   coverageDirectory: "<rootDir>/coverage/unit",
-  coverageReporters: ["text", "html", "json-summary", "lcov"]
+  coverageReporters: ["text", "json-summary", "lcov"]
 };

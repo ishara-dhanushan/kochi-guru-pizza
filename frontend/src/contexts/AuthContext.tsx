@@ -9,10 +9,11 @@ import React, {
   useCallback,
   useMemo
 } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { authService } from "@services/authService";
 import { getAccessToken } from "@lib/httpClient";
+import { beginExplicitLogout, clearAuthReturnTo } from "@lib/authRedirect";
 import { User } from "@typings/user";
 import { AuthContextType } from "@typings/auth";
 
@@ -24,6 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -45,6 +47,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     initAuth();
   }, []);
+
+  useEffect(() => {
+    const isPublicPage =
+      pathname === "/" ||
+      ["/menu", "/about", "/contact", "/cart"].some(
+        (route) => pathname === route || pathname.startsWith(`${route}/`)
+      );
+
+    if (isPublicPage) {
+      clearAuthReturnTo();
+    }
+  }, [pathname]);
 
   const login = useCallback(async (email: string, password: string) => {
     try {
@@ -81,15 +95,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const logout = useCallback(async () => {
+    beginExplicitLogout();
+
     try {
       await authService.logout();
-      setUser(null);
       toast.success("Logged out successfully");
-      router.push("/");
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Logout failed";
-      toast.error(message);
       console.error("Logout error:", error);
+      toast.error("You have been signed out.");
+    } finally {
+      setUser(null);
+      router.replace("/");
     }
   }, [router]);
 

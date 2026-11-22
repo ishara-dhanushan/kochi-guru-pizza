@@ -4,6 +4,7 @@
 import { Suspense, useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setTokens } from "@lib/httpClient";
+import { consumeAuthReturnTo } from "@lib/authRedirect";
 import { useAuth } from "@contexts/AuthContext";
 import toast from "react-hot-toast";
 import { CheckCircle, XCircle } from "lucide-react";
@@ -71,7 +72,7 @@ function AuthCallbackContent() {
           // Show success message for 3 seconds then redirect
           activeSetTimeout(() => {
             toast.success("Login successful!");
-            router.push("/");
+            router.replace(consumeAuthReturnTo());
           }, 3000);
         }, delay);
       } else {
@@ -116,9 +117,7 @@ function AuthCallbackContent() {
             <h2 className="text-2xl font-bold text-content-main mb-2">
               Authentication Success
             </h2>
-            <p className="text-content-muted font-medium">
-              Redirecting you to the homepage...
-            </p>
+            <p className="text-content-muted font-medium">Redirecting you...</p>
           </>
         )}
 

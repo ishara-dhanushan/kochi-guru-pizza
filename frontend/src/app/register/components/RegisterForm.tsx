@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@contexts/AuthContext";
 import { authService } from "@services/authService";
+import { consumeAuthReturnTo } from "@lib/authRedirect";
 import { ApiError } from "@typings/api";
 
 export default function RegisterForm() {
@@ -82,7 +83,7 @@ export default function RegisterForm() {
 
     try {
       await register(formData.name, formData.email, formData.password);
-      router.push("/");
+      router.replace(consumeAuthReturnTo());
     } catch (err) {
       const error = err as ApiError;
       console.error("Registration failed:", error);

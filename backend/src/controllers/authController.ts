@@ -295,7 +295,9 @@ export const googleCallback = async (req: Request, res: Response) => {
     const user = req.user as IUser;
 
     if (!user) {
-      return res.redirect(`${config.FRONTEND_URL}?error=auth_failed`);
+      return res.redirect(
+        `${config.FRONTEND_URL}/auth/callback?error=auth_failed`
+      );
     }
 
     // Generate tokens
@@ -318,7 +320,7 @@ export const googleCallback = async (req: Request, res: Response) => {
     );
   } catch (error) {
     console.error("Google callback error:", error);
-    res.redirect(`${config.FRONTEND_URL}?error=auth_failed`);
+    res.redirect(`${config.FRONTEND_URL}/auth/callback?error=auth_failed`);
   }
 };
 

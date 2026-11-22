@@ -1,5 +1,6 @@
 // src/lib/httpClient.ts
 import { ApiError } from "@lib/ApiError";
+import { saveAuthReturnTo } from "@lib/authRedirect";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1";
 
@@ -10,7 +11,16 @@ const REFRESH_TOKEN_KEY = "kochi_refresh_token";
 // Share a single refresh request between concurrent HTTP requests.
 let refreshPromise: Promise<string> | null = null;
 
-const publicRoutes = ["/", "/menu", "/about", "/contact", "/cart"];
+const publicRoutes = [
+  "/",
+  "/menu",
+  "/about",
+  "/contact",
+  "/cart",
+  "/login",
+  "/register",
+  "/auth/callback"
+];
 
 const isPublicRoute = (pathname: string) => {
   return publicRoutes.some(
@@ -148,8 +158,13 @@ export const httpClient = async <T>(
 
                       if (
                         typeof window !== "undefined" &&
+                        endpoint !== "/auth/logout" &&
                         !isPublicRoute(window.location.pathname)
                       ) {
+                        saveAuthReturnTo(
+                          window.location.pathname + window.location.search
+                        );
+
                         window.location.href = new URL(
                           "/login",
                           window.location.origin
@@ -191,8 +206,13 @@ export const httpClient = async <T>(
 
                 if (
                   typeof window !== "undefined" &&
+                  endpoint !== "/auth/logout" &&
                   !isPublicRoute(window.location.pathname)
                 ) {
+                  saveAuthReturnTo(
+                    window.location.pathname + window.location.search
+                  );
+
                   window.location.href = new URL(
                     "/login",
                     window.location.origin
@@ -214,7 +234,8 @@ export const httpClient = async <T>(
                 errorData.error ||
                   `HTTP error! status: ${retryResponse.status}`,
                 retryResponse.status,
-                errorData.details
+                errorData.details,
+                errorData.code
               );
             }
 
@@ -237,8 +258,11 @@ export const httpClient = async <T>(
 
           if (
             typeof window !== "undefined" &&
+            endpoint !== "/auth/logout" &&
             !isPublicRoute(window.location.pathname)
           ) {
+            saveAuthReturnTo(window.location.pathname + window.location.search);
+
             window.location.href = new URL(
               "/login",
               window.location.origin
@@ -260,7 +284,8 @@ export const httpClient = async <T>(
         throw new ApiError(
           errorData.error || `HTTP error! status: ${response.status}`,
           response.status,
-          errorData.details
+          errorData.details,
+          errorData.code
         );
       }
 
