@@ -6,10 +6,12 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
 
-  // Exclude dependencies and generated build files.
+  // Exclude dependencies, generated build files, and test reports.
   globalIgnores([
     "node_modules/**",
     ".next/**",
+    ".next-e2e/**",
+    "coverage/**",
     "out/**",
     "build/**",
     "next-env.d.ts"

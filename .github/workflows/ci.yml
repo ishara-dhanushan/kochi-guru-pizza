@@ -16,9 +16,11 @@ on:
 jobs:
   frontend-check:
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: ./frontend
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -38,6 +40,15 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+
+      - name: Type-check frontend
+        run: npm run typecheck
+
+      - name: Run unit tests with coverage
+        run: npm run test:unit:coverage
+
+      - name: Run integration tests with coverage
+        run: npm run test:integration:coverage
 
       - name: Build Next.js app
         run: npm run build
@@ -60,6 +71,7 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
