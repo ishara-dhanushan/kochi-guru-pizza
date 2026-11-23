@@ -135,4 +135,78 @@ describe("OrderController HTTP response handling", () => {
       expect.objectContaining({ code: "IDEMPOTENCY_CONFLICT" })
     );
   });
+
+  describe("Controller failure responses", () => {
+    it("should reject invalid customer order pagination with HTTP 400", async () => {
+      const { req, res } = makeHttpContext({ query: { page: "0" } });
+      await orderController.listMyOrders(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ error: "Validation failed" })
+      );
+      expect(orderService.listOrders).not.toHaveBeenCalled();
+    });
+
+    it("should reject unsupported staff order filters with HTTP 400", async () => {
+      const { req, res } = makeHttpContext({ query: { status: "invalid" } });
+      await orderController.listAllOrders(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(orderService.listOrders).not.toHaveBeenCalled();
+    });
+
+    it("should omit unexpected error details from HTTP 500 responses and logs", async () => {
+      const log = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => undefined);
+      jest
+        .mocked(orderService.createOrder)
+        .mockRejectedValue(new Error("PRIVATE_ORDER_CUSTOMER_DATA"));
+      try {
+        const { req, res } = makeHttpContext();
+        await orderController.createOrder(req, res);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+          error: "An unexpected order processing error occurred"
+        });
+        expect(log).toHaveBeenCalledWith("createOrder error:", "Error");
+      } finally {
+        log.mockRestore();
+      }
+    });
+
+    it("should send validated status changes to the order service", async () => {
+      jest
+        .mocked(orderService.updateOrderStatus)
+        .mockResolvedValue({} as never);
+      const { req, res } = makeHttpContext({
+        params: { id: "69a40f3d8bbc889da274ff37" },
+        body: { status: "confirmed" }
+      });
+      await orderController.updateOrderStatus(req, res);
+      expect(orderService.updateOrderStatus).toHaveBeenCalledWith(
+        "69a40f3d8bbc889da274ff37",
+        "confirmed"
+      );
+      expect(res.json).toHaveBeenCalledWith({
+        order: expect.objectContaining({ status: "pending" })
+      });
+    });
+
+    it("should return 404 when the service cannot find an order", async () => {
+      jest
+        .mocked(orderService.updateOrderStatus)
+        .mockRejectedValue(
+          new OrderError(404, "ORDER_NOT_FOUND", "Order not found")
+        );
+      const { req, res } = makeHttpContext({
+        params: { id: "69a40f3d8bbc889da274ff37" },
+        body: { status: "confirmed" }
+      });
+      await orderController.updateOrderStatus(req, res);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ code: "ORDER_NOT_FOUND" })
+      );
+    });
+  });
 });

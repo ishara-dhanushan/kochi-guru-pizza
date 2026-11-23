@@ -154,4 +154,87 @@ describe("CartContent with real cart state and menu hooks", () => {
       ).toBeEnabled();
     });
   });
+
+  describe("Cart selection and empty-cart behavior", () => {
+    it("should display the empty-cart state without a menu request", async () => {
+      renderCart([]);
+      expect(
+        await screen.findByRole("heading", { name: "Your cart is empty" })
+      ).toBeVisible();
+      expect(screen.getByRole("link", { name: "Browse Menu" })).toBeVisible();
+      expect(mocks.request).not.toHaveBeenCalled();
+    });
+
+    it("should clear persisted items when the customer clears the cart", async () => {
+      renderCart([cartPizza(), cartPasta()]);
+      await userEvent
+        .setup()
+        .click(screen.getByRole("button", { name: "Clear Cart" }));
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { name: "Your cart is empty" })
+        ).toBeVisible();
+        expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+      });
+      expect(mocks.success).toHaveBeenCalledWith("Cart cleared");
+    });
+
+    it("should select all available items in one interaction", async () => {
+      renderCart([
+        cartPizza({ selected: false }),
+        cartPasta({ selected: false })
+      ]);
+      const checkbox = await screen.findByRole("checkbox", {
+        name: "Select all available items"
+      });
+      await waitFor(() => expect(checkbox).toBeEnabled());
+      await userEvent.setup().click(checkbox);
+      await waitFor(() => {
+        const stored = JSON.parse(
+          window.localStorage.getItem(STORAGE_KEY) ?? "[]"
+        );
+        expect(stored).toHaveLength(2);
+        expect(
+          stored.every((item: { selected: boolean }) => item.selected)
+        ).toBe(true);
+      });
+    });
+
+    it("should remove one pizza line without removing another product", async () => {
+      renderCart([cartPizza(), cartPasta()]);
+      const remove = await screen.findByRole("button", {
+        name: "Remove Margherita Pizza, medium from cart"
+      });
+      await userEvent.setup().click(remove);
+      await waitFor(() => {
+        const stored = JSON.parse(
+          window.localStorage.getItem(STORAGE_KEY) ?? "[]"
+        );
+        expect(stored).toHaveLength(1);
+        expect(stored[0].menuItemId).toBe(pasta._id);
+      });
+    });
+
+    it("should leave unavailable items deselected when selecting all", async () => {
+      mocks.request.mockResolvedValue({
+        items: [pizza, { ...pasta, isAvailable: false }]
+      });
+      renderCart([
+        cartPizza({ selected: false }),
+        cartPasta({ selected: false })
+      ]);
+      const checkbox = await screen.findByRole("checkbox", {
+        name: "Select all available items"
+      });
+      await waitFor(() => expect(checkbox).toBeEnabled());
+      await userEvent.setup().click(checkbox);
+      await waitFor(() => {
+        const stored = JSON.parse(
+          window.localStorage.getItem(STORAGE_KEY) ?? "[]"
+        );
+        expect(stored[0].selected).toBe(true);
+        expect(stored[1].selected).toBe(false);
+      });
+    });
+  });
 });

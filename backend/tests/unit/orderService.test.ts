@@ -8,6 +8,7 @@ import { getOrderPricing } from "@services/orderPricingService";
 import {
   createOrder,
   getRequestHash,
+  listOrders,
   toOrderResponse,
   updateOrderStatus
 } from "@services/orderService";
@@ -238,6 +239,198 @@ describe("OrderService business rules", () => {
         code: "PAYMENT_NOT_VERIFIED"
       });
       expect(Order.findOneAndUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Additional order business rules", () => {
+    it("should distinguish changes to checkout contact or delivery details", () => {
+      expect(getRequestHash({ ...orderInput, phone: "0779999999" })).not.toBe(
+        getRequestHash(orderInput)
+      );
+      expect(
+        getRequestHash({
+          ...orderInput,
+          deliveryType: "delivery",
+          address: "123 Main Street"
+        })
+      ).not.toBe(getRequestHash(orderInput));
+    });
+
+    it("should distinguish the selected sizes of the same pizza", () => {
+      const medium: CreateOrderInput = {
+        ...orderInput,
+        items: [{ menuItemId, selectedSize: "medium", qty: 1 }]
+      };
+      const large: CreateOrderInput = {
+        ...orderInput,
+        items: [{ menuItemId, selectedSize: "large", qty: 1 }]
+      };
+      expect(getRequestHash(medium)).not.toBe(getRequestHash(large));
+    });
+
+    it("should expose delivery details without leaking private checkout identifiers", () => {
+      const result = toOrderResponse(
+        storedOrder({ address: "123 Main Street", paymentStatus: "paid" })
+      );
+      expect(result.address).toBe("123 Main Street");
+      expect(result.paymentStatus).toBe("paid");
+      expect(result.items[0].qty).toBe(2);
+      expect(result).not.toHaveProperty("idempotencyKey");
+      expect(result).not.toHaveProperty("requestHash");
+    });
+
+    it("should filter paginated customer orders by user and status", async () => {
+      const cursor = {
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest
+          .fn()
+          .mockResolvedValue([storedOrder({ status: "confirmed" })] as never)
+      };
+      jest.spyOn(Order, "find").mockReturnValue(cursor as never);
+      jest.spyOn(Order, "countDocuments").mockResolvedValue(7 as never);
+
+      const result = await listOrders(
+        { page: 2, limit: 5, status: "confirmed" },
+        userId
+      );
+      expect(Order.find).toHaveBeenCalledWith({ userId, status: "confirmed" });
+      expect(cursor.sort).toHaveBeenCalledWith({ createdAt: -1, _id: -1 });
+      expect(cursor.skip).toHaveBeenCalledWith(5);
+      expect(cursor.limit).toHaveBeenCalledWith(5);
+      expect(Order.countDocuments).toHaveBeenCalledWith({
+        userId,
+        status: "confirmed"
+      });
+      expect(result.orders).toHaveLength(1);
+      expect(result.pagination).toEqual({
+        page: 2,
+        limit: 5,
+        total: 7,
+        totalPages: 2
+      });
+    });
+
+    it("should list all orders without restricting them to a customer", async () => {
+      const cursor = {
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockResolvedValue([] as never)
+      };
+      jest.spyOn(Order, "find").mockReturnValue(cursor as never);
+      jest.spyOn(Order, "countDocuments").mockResolvedValue(0 as never);
+      const result = await listOrders({ page: 1, limit: 20 });
+      expect(Order.find).toHaveBeenCalledWith({});
+      expect(Order.countDocuments).toHaveBeenCalledWith({});
+      expect(result.pagination.totalPages).toBe(0);
+    });
+
+    it("should reject status changes for a nonexistent order", async () => {
+      jest.spyOn(Order, "findById").mockResolvedValue(null as never);
+      await expect(
+        updateOrderStatus(userId, "confirmed")
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: "ORDER_NOT_FOUND"
+      });
+      expect(Order.findOneAndUpdate).not.toHaveBeenCalled();
+    });
+
+    it("should return an unchanged order for a repeated status update", async () => {
+      const current = storedOrder({ status: "confirmed" });
+      jest.spyOn(Order, "findById").mockResolvedValue(current as never);
+      const result = await updateOrderStatus(userId, "confirmed");
+      expect(result).toBe(current);
+      expect(Order.findOneAndUpdate).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ["pending", "confirmed"],
+      ["pending", "cancelled"],
+      ["confirmed", "preparing"],
+      ["confirmed", "cancelled"],
+      ["preparing", "ready"],
+      ["ready", "delivered"]
+    ] as Array<[IOrder["status"], IOrder["status"]]>)(
+      "should allow transition from %s to %s",
+      async (from, to) => {
+        jest
+          .spyOn(Order, "findById")
+          .mockResolvedValue(storedOrder({ status: from }) as never);
+        jest
+          .spyOn(Order, "findOneAndUpdate")
+          .mockResolvedValue(storedOrder({ status: to }) as never);
+        const result = await updateOrderStatus(userId, to);
+        expect(result.status).toBe(to);
+        expect(Order.findOneAndUpdate).toHaveBeenCalledWith(
+          expect.objectContaining({ status: from, paymentStatus: "unpaid" }),
+          { $set: { status: to } },
+          expect.objectContaining({ runValidators: true })
+        );
+      }
+    );
+
+    it.each([
+      ["delivered", "confirmed"],
+      ["cancelled", "pending"],
+      ["preparing", "cancelled"]
+    ] as Array<[IOrder["status"], IOrder["status"]]>)(
+      "should reject transition from %s to %s",
+      async (from, to) => {
+        jest
+          .spyOn(Order, "findById")
+          .mockResolvedValue(storedOrder({ status: from }) as never);
+        await expect(updateOrderStatus(userId, to)).rejects.toMatchObject({
+          statusCode: 409,
+          code: "INVALID_STATUS_TRANSITION"
+        });
+        expect(Order.findOneAndUpdate).not.toHaveBeenCalled();
+      }
+    );
+
+    it.each(["paid", "refund_pending", "chargeback"] as const)(
+      "should reject cancelling orders with %s payment status",
+      async (paymentStatus) => {
+        jest
+          .spyOn(Order, "findById")
+          .mockResolvedValue(storedOrder({ paymentStatus }) as never);
+        await expect(
+          updateOrderStatus(userId, "cancelled")
+        ).rejects.toMatchObject({
+          statusCode: 409,
+          code: "REFUND_REQUIRED"
+        });
+        expect(Order.findOneAndUpdate).not.toHaveBeenCalled();
+      }
+    );
+
+    it("should allow an unpaid online order to be cancelled", async () => {
+      jest.spyOn(Order, "findById").mockResolvedValue(
+        storedOrder({
+          paymentMethod: "online",
+          paymentStatus: "unpaid"
+        }) as never
+      );
+      jest
+        .spyOn(Order, "findOneAndUpdate")
+        .mockResolvedValue(storedOrder({ status: "cancelled" }) as never);
+      const order = await updateOrderStatus(userId, "cancelled");
+      expect(order.status).toBe("cancelled");
+    });
+
+    it("should allow a verified online order to enter fulfilment", async () => {
+      jest.spyOn(Order, "findById").mockResolvedValue(
+        storedOrder({
+          paymentMethod: "online",
+          paymentStatus: "paid"
+        }) as never
+      );
+      await updateOrderStatus(userId, "confirmed");
+      expect(Order.findOneAndUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ paymentStatus: "paid" }),
+        { $set: { status: "confirmed" } },
+        expect.any(Object)
+      );
     });
   });
 });

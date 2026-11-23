@@ -95,4 +95,198 @@ describe("Order pricing and amount validation", () => {
     expect(fromMinorUnits(1999)).toBe(19.99);
     expect(fromMinorUnits(toMinorUnits(0.1) + toMinorUnits(0.2))).toBe(0.3);
   });
+
+  describe("Pricing edge cases and minor units", () => {
+    it("should reject an empty selection before calculating an order", () => {
+      expect(() => calculateOrderPricing([], "pickup", [pizza])).toThrow(
+        "An order must contain at least one item"
+      );
+    });
+
+    it("should reject repeated item-and-size selections regardless of ID casing", () => {
+      expect(() =>
+        calculateOrderPricing(
+          [
+            { menuItemId: pizzaId, selectedSize: "large", qty: 1 },
+            { menuItemId: pizzaId.toUpperCase(), selectedSize: "large", qty: 1 }
+          ],
+          "pickup",
+          [pizza]
+        )
+      ).toThrow("Duplicate menu item and size combination");
+    });
+
+    it("should permit two different sizes of the same pizza", () => {
+      const result = calculateOrderPricing(
+        [
+          { menuItemId: pizzaId, selectedSize: "small", qty: 1 },
+          { menuItemId: pizzaId, selectedSize: "large", qty: 1 }
+        ],
+        "pickup",
+        [pizza]
+      );
+      expect(result.items).toHaveLength(2);
+      expect(result.total).toBe(4500);
+    });
+
+    it("should resolve uppercase IDs and snapshot the current product image", () => {
+      const result = calculateOrderPricing(
+        [{ menuItemId: pizzaId.toUpperCase(), selectedSize: "large", qty: 1 }],
+        "pickup",
+        [{ ...pizza, images: ["https://example.test/pizza.png"] }]
+      );
+      expect(result.items[0]).toMatchObject({
+        menuItemId: pizzaId,
+        imageUrlSnapshot: "https://example.test/pizza.png"
+      });
+    });
+
+    it.each([0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1])(
+      "should reject invalid quantities: %s",
+      (qty) => {
+        expect(() =>
+          calculateOrderPricing([{ menuItemId: bunId, qty }], "pickup", [bun])
+        ).toThrow("Quantity must be a positive integer");
+      }
+    );
+
+    it("should reject a size removed from the authoritative menu", () => {
+      expect(() =>
+        calculateOrderPricing(
+          [{ menuItemId: pizzaId, selectedSize: "medium", qty: 1 }],
+          "pickup",
+          [pizza]
+        )
+      ).toThrow("The selected size is unavailable");
+    });
+
+    it("should reject duplicate variants for the same selected size", () => {
+      expect(() =>
+        calculateOrderPricing(
+          [{ menuItemId: pizzaId, selectedSize: "large", qty: 1 }],
+          "pickup",
+          [
+            {
+              ...pizza,
+              variants: [
+                ...(pizza.variants ?? []),
+                { size: "large", price: 3000 }
+              ]
+            }
+          ]
+        )
+      ).toThrow("Invalid pricing configuration");
+    });
+
+    it("should reject a variant item that also declares a flat price", () => {
+      expect(() =>
+        calculateOrderPricing(
+          [{ menuItemId: pizzaId, selectedSize: "large", qty: 1 }],
+          "pickup",
+          [{ ...pizza, price: 800 }]
+        )
+      ).toThrow("Invalid pricing configuration");
+    });
+
+    it("should reject a flat-priced product containing variants", () => {
+      expect(() =>
+        calculateOrderPricing([{ menuItemId: bunId, qty: 1 }], "pickup", [
+          { ...bun, variants: [{ size: "small", price: 400 }] }
+        ])
+      ).toThrow("Invalid pricing configuration");
+    });
+
+    it("should reject a flat-priced product with no price", () => {
+      expect(() =>
+        calculateOrderPricing([{ menuItemId: bunId, qty: 1 }], "pickup", [
+          { ...bun, price: undefined }
+        ])
+      ).toThrow("Invalid pricing configuration");
+    });
+
+    it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, 1.005])(
+      "should reject invalid stored prices: %s",
+      (price) => {
+        expect(() =>
+          calculateOrderPricing([{ menuItemId: bunId, qty: 1 }], "pickup", [
+            { ...bun, price }
+          ])
+        ).toThrow("A menu item has an invalid price");
+      }
+    );
+
+    it("should reject overflow when a valid integer quantity exceeds safe totals", () => {
+      expect(() =>
+        calculateOrderPricing(
+          [{ menuItemId: bunId, qty: Number.MAX_SAFE_INTEGER }],
+          "pickup",
+          [bun]
+        )
+      ).toThrow("Unable to calculate a valid order amount");
+    });
+
+    it.each([-1, 1.5, Number.POSITIVE_INFINITY])(
+      "should reject invalid discount amounts in minor units: %s",
+      (discount) => {
+        expect(() =>
+          calculateOrderPricing(
+            [{ menuItemId: bunId, qty: 1 }],
+            "pickup",
+            [bun],
+            () => discount
+          )
+        ).toThrow("Unable to calculate a valid order amount");
+      }
+    );
+
+    it("should apply a trusted discount without floating-point drift", () => {
+      const result = calculateOrderPricing(
+        [{ menuItemId: bunId, qty: 1 }],
+        "pickup",
+        [bun],
+        () => 150
+      );
+      expect(result).toMatchObject({
+        currency: "LKR",
+        subtotal: 700,
+        discountAmount: 1.5,
+        deliveryFee: 0,
+        total: 698.5
+      });
+      expect(result.items[0].lineTotal).toBe(698.5);
+    });
+
+    it("should keep delivery fees at zero under the current provisional policy", () => {
+      const result = calculateOrderPricing(
+        [{ menuItemId: bunId, qty: 1 }],
+        "delivery",
+        [bun]
+      );
+      expect(result.deliveryFee).toBe(0);
+      expect(result.total).toBe(700);
+    });
+
+    it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, 1.005])(
+      "should reject invalid LKR conversions: %s",
+      (amount) => {
+        expect(() => toMinorUnits(amount)).toThrow(
+          "A menu item has an invalid price"
+        );
+      }
+    );
+
+    it.each([-1, 1.5, Number.POSITIVE_INFINITY])(
+      "should reject invalid minor-unit conversions: %s",
+      (amount) => {
+        expect(() => fromMinorUnits(amount)).toThrow(
+          "Unable to calculate a valid order amount"
+        );
+      }
+    );
+
+    it("should preserve zero-value amounts through both conversions", () => {
+      expect(toMinorUnits(0)).toBe(0);
+      expect(fromMinorUnits(0)).toBe(0);
+    });
+  });
 });

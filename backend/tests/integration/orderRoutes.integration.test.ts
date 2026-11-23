@@ -298,4 +298,190 @@ describe("Order API with real MongoDB", () => {
       }
     });
   });
+
+  describe("Additional order API validation", () => {
+    describe("POST /v1/orders: request validation", () => {
+      it("should reject a cart without items", async () => {
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({ items: [] })
+        );
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Validation failed");
+      });
+
+      it("should reject malformed product identifiers", async () => {
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({ items: [{ menuItemId: "invalid", qty: 1 }] })
+        );
+        expect(response.status).toBe(400);
+      });
+
+      it("should reject quantities exceeding the request limit", async () => {
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({
+            items: [
+              {
+                menuItemId: getFixtures().pizzaId.toString(),
+                selectedSize: "large",
+                qty: 1001
+              }
+            ]
+          })
+        );
+        expect(response.status).toBe(400);
+      });
+
+      it("should reject duplicate product and size entries", async () => {
+        const item = {
+          menuItemId: getFixtures().pizzaId.toString(),
+          selectedSize: "large",
+          qty: 1
+        };
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({ items: [item, item] })
+        );
+        expect(response.status).toBe(400);
+      });
+
+      it("should reject invalid contact details", async () => {
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({ phone: "invalid-phone" })
+        );
+        expect(response.status).toBe(400);
+      });
+
+      it("should reject client-supplied payment state", async () => {
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({ paymentStatus: "paid" })
+        );
+        expect(response.status).toBe(400);
+      });
+
+      it("should reject a pickup address", async () => {
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({ address: "123 Main Street" })
+        );
+        expect(response.status).toBe(400);
+      });
+
+      it("should save a delivery address and the authoritative menu total", async () => {
+        // Delivery charges are currently zero pending restaurant policy approval.
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({ deliveryType: "delivery", address: "123 Main Street" })
+        );
+        expect(response.status).toBe(201);
+        expect(response.body.order).toMatchObject({
+          deliveryType: "delivery",
+          address: "123 Main Street",
+          subtotal: 6000,
+          deliveryFee: 0,
+          total: 6000
+        });
+        expect(response.headers["cache-control"]).toBe("no-store");
+      });
+
+      it("should reject a pizza size not in the current menu", async () => {
+        const response = await sendCreateOrder(
+          getFixtures().customerToken,
+          makePayload({
+            items: [
+              {
+                menuItemId: getFixtures().pizzaId.toString(),
+                selectedSize: "medium",
+                qty: 1
+              }
+            ]
+          })
+        );
+        expect(response.status).toBe(409);
+        expect(response.body.code).toBe("SIZE_UNAVAILABLE");
+      });
+    });
+
+    describe("GET /v1/orders/me: pagination and filters", () => {
+      it("should reject invalid customer pagination", async () => {
+        const response = await request(app)
+          .get("/v1/orders/me?page=0&limit=200")
+          .set("Authorization", `Bearer ${getFixtures().customerToken}`);
+        expect(response.status).toBe(400);
+      });
+
+      it("should filter the current customer's orders by status", async () => {
+        const id = await createCustomerOrder();
+        const response = await request(app)
+          .get("/v1/orders/me?status=pending&page=1&limit=1")
+          .set("Authorization", `Bearer ${getFixtures().customerToken}`);
+        expect(response.status).toBe(200);
+        expect(response.headers["cache-control"]).toBe("no-store");
+        expect(response.body.pagination).toMatchObject({
+          page: 1,
+          limit: 1,
+          total: 1
+        });
+        expect(response.body.orders[0]._id).toBe(id);
+      });
+    });
+
+    describe("GET /v1/orders: staff authorization", () => {
+      it("should require authentication for the staff listing", async () => {
+        const response = await request(app).get("/v1/orders");
+        expect(response.status).toBe(401);
+      });
+
+      it("should reject unsupported staff status filters", async () => {
+        const response = await request(app)
+          .get("/v1/orders?status=unknown")
+          .set("Authorization", `Bearer ${getFixtures().staffToken}`);
+        expect(response.status).toBe(400);
+      });
+    });
+
+    describe("PATCH /v1/orders/:id/status: invalid requests", () => {
+      it("should require authorization before changing an order", async () => {
+        const response = await request(app)
+          .patch(
+            `/v1/orders/${getFixtures().otherCustomerId.toString()}/status`
+          )
+          .send({ status: "confirmed" });
+        expect(response.status).toBe(401);
+      });
+
+      it("should reject malformed order IDs", async () => {
+        const response = await request(app)
+          .patch("/v1/orders/not-an-object-id/status")
+          .set("Authorization", `Bearer ${getFixtures().staffToken}`)
+          .send({ status: "confirmed" });
+        expect(response.status).toBe(400);
+      });
+
+      it("should return 404 for a nonexistent order", async () => {
+        const response = await request(app)
+          .patch(
+            `/v1/orders/${getFixtures().otherCustomerId.toString()}/status`
+          )
+          .set("Authorization", `Bearer ${getFixtures().adminToken}`)
+          .send({ status: "confirmed" });
+        expect(response.status).toBe(404);
+        expect(response.body.code).toBe("ORDER_NOT_FOUND");
+      });
+
+      it("should reject changes to payment status through the order route", async () => {
+        const response = await request(app)
+          .patch(
+            `/v1/orders/${getFixtures().otherCustomerId.toString()}/status`
+          )
+          .set("Authorization", `Bearer ${getFixtures().adminToken}`)
+          .send({ status: "confirmed", paymentStatus: "paid" });
+        expect(response.status).toBe(400);
+      });
+    });
+  });
 });
