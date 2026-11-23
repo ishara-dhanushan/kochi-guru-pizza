@@ -1,8 +1,8 @@
 // e2e/smoke.spec.ts
 import { expect, test } from "@playwright/test";
 
-test.describe("Application smoke tests", () => {
-  test("renders the login page in Chromium", async ({ page }) => {
+test.describe("Application startup and connectivity smoke tests", () => {
+  test("should render the login page in Chromium", async ({ page }) => {
     await page.goto("/login");
 
     await expect(
@@ -13,7 +13,9 @@ test.describe("Application smoke tests", () => {
     ).toBeVisible();
   });
 
-  test("connects to the real backend and E2E MongoDB", async ({ request }) => {
+  test("should reach the backend connected to E2E MongoDB", async ({
+    request
+  }) => {
     const response = await request.get(
       "http://127.0.0.1:5005/v1/menu?isAvailable=true"
     );

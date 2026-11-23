@@ -1,3 +1,4 @@
+// tests/integration/CartContext.spec.tsx
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -65,8 +66,8 @@ beforeEach(() => {
   window.localStorage.clear();
 });
 
-describe("CartProvider persisted cart workflow", () => {
-  it("hydrates an empty cart and persists newly added sizes as separate lines", async () => {
+describe("CartProvider persistence and quantity operations", () => {
+  it("should persist separate sizes and combined quantities", async () => {
     const user = userEvent.setup();
     render(
       <CartProvider>
@@ -91,7 +92,7 @@ describe("CartProvider persisted cart workflow", () => {
     ).toHaveLength(2);
   });
 
-  it("restores legacy data but never persists outdated price or image fields", async () => {
+  it("should sanitize legacy cart data on hydration", async () => {
     window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify([
@@ -123,7 +124,7 @@ describe("CartProvider persisted cart workflow", () => {
     });
   });
 
-  it("rejects invalid quantities and preserves the checkbox selection", async () => {
+  it("should reject invalid quantities without resetting selection", async () => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify([cartPizza()]));
     const user = userEvent.setup();
     render(
@@ -141,7 +142,7 @@ describe("CartProvider persisted cart workflow", () => {
     expect(readItems()[0]).toMatchObject({ quantity: 3, selected: false });
   });
 
-  it("subtracts only confirmed purchased quantities and keeps other items", async () => {
+  it("should remove only purchased quantities after checkout", async () => {
     window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify([

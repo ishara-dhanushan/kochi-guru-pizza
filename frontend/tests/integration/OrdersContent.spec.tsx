@@ -1,3 +1,4 @@
+// tests/integration/OrdersContent.spec.tsx
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
@@ -48,8 +49,8 @@ beforeEach(() => {
   window.history.replaceState(null, "", "/orders");
 });
 
-describe("order history: screen + real order service", () => {
-  it("redirects guests and avoids fetching private orders", async () => {
+describe("OrdersContent history and recovery workflows", () => {
+  it("should redirect guests without fetching private orders", async () => {
     mocks.user = null;
     render(<OrdersContent />);
 
@@ -58,7 +59,7 @@ describe("order history: screen + real order service", () => {
     expect(mocks.request).not.toHaveBeenCalled();
   });
 
-  it("renders stored order snapshots from the first customer page", async () => {
+  it("should display the customer's saved order snapshots", async () => {
     mocks.request.mockResolvedValue(response());
     render(<OrdersContent />);
 
@@ -69,7 +70,7 @@ describe("order history: screen + real order service", () => {
     expect(screen.getAllByText("Rs. 2,900.5").length).toBeGreaterThan(0);
   });
 
-  it("filters by status using the real service query string", async () => {
+  it("should filter history by selected order status", async () => {
     mocks.request.mockResolvedValue({
       orders: [],
       pagination: { page: 1, limit: 10, total: 0, totalPages: 0 }
@@ -87,7 +88,7 @@ describe("order history: screen + real order service", () => {
     );
   });
 
-  it("requests the next page and displays its result", async () => {
+  it("should display the next page of order history", async () => {
     mocks.request
       .mockResolvedValueOnce(response(1, 2))
       .mockResolvedValueOnce(response(2, 2));
@@ -102,7 +103,7 @@ describe("order history: screen + real order service", () => {
     );
   });
 
-  it("shows a recovery button and retries the same page after failure", async () => {
+  it("should retry the current page after network errors", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     mocks.request
       .mockRejectedValueOnce(new Error("Network unavailable"))

@@ -31,8 +31,8 @@ const bun: PricingMenuItem = {
   images: []
 };
 
-describe("Order pricing", () => {
-  it("calculates totals from menu prices", () => {
+describe("Order pricing and amount validation", () => {
+  it("should calculate totals using authoritative prices", () => {
     const result = calculateOrderPricing(
       [
         { menuItemId: pizzaId, selectedSize: "large", qty: 2 },
@@ -47,7 +47,7 @@ describe("Order pricing", () => {
     expect(result.items[0].unitPrice).toBe(3000);
   });
 
-  it("rejects unavailable menu items", () => {
+  it("should reject unavailable menu items", () => {
     expect(() =>
       calculateOrderPricing([{ menuItemId: bunId, qty: 1 }], "pickup", [
         { ...bun, isAvailable: false }
@@ -55,7 +55,7 @@ describe("Order pricing", () => {
     ).toThrow("A selected menu item is no longer available");
   });
 
-  it("requires a size for pizzas", () => {
+  it("should require a size for variant-priced pizzas", () => {
     expect(() =>
       calculateOrderPricing([{ menuItemId: pizzaId, qty: 1 }], "pickup", [
         pizza
@@ -63,7 +63,7 @@ describe("Order pricing", () => {
     ).toThrow("Select a size");
   });
 
-  it("rejects size selections for flat-priced menu items", () => {
+  it("should reject sizes for flat-priced products", () => {
     expect(() =>
       calculateOrderPricing(
         [{ menuItemId: bunId, selectedSize: "large", qty: 1 }],
@@ -73,13 +73,13 @@ describe("Order pricing", () => {
     ).toThrow("does not support size selection");
   });
 
-  it("rejects missing menu items", () => {
+  it("should reject missing menu items", () => {
     expect(() =>
       calculateOrderPricing([{ menuItemId: bunId, qty: 1 }], "pickup", [])
     ).toThrow("A selected menu item is no longer available");
   });
 
-  it("rejects a discount larger than the line subtotal", () => {
+  it("should reject discounts larger than item subtotals", () => {
     expect(() =>
       calculateOrderPricing(
         [{ menuItemId: bunId, qty: 1 }],
@@ -90,7 +90,7 @@ describe("Order pricing", () => {
     ).toThrow("A discount exceeds the item subtotal");
   });
 
-  it("uses integer minor units for decimal amounts", () => {
+  it("should preserve price precision in minor units", () => {
     expect(toMinorUnits(19.99)).toBe(1999);
     expect(fromMinorUnits(1999)).toBe(19.99);
     expect(fromMinorUnits(toMinorUnits(0.1) + toMinorUnits(0.2))).toBe(0.3);

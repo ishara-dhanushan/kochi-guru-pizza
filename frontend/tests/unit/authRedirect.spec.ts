@@ -1,3 +1,4 @@
+// tests/unit/authRedirect.spec.ts
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   beginExplicitLogout,
@@ -11,8 +12,8 @@ beforeEach(() => {
   window.sessionStorage.clear();
 });
 
-describe("safe authentication return paths", () => {
-  it("preserves a checkout return path and consumes it only once", () => {
+describe("Authentication return-path security", () => {
+  it("should consume a valid checkout return path once", () => {
     saveAuthReturnTo("/checkout?source=cart#details");
     expect(consumeAuthReturnTo()).toBe("/checkout?source=cart#details");
     expect(consumeAuthReturnTo()).toBe("/");
@@ -25,19 +26,19 @@ describe("safe authentication return paths", () => {
     "/register",
     "/auth/callback",
     "/\\evil.example"
-  ])("rejects an unsafe or circular return path: %s", (path) => {
+  ])("should reject an unsafe or circular path: %s", (path) => {
     saveAuthReturnTo(path);
     expect(consumeAuthReturnTo()).toBe("/");
   });
 
-  it("discards saved returns on explicit logout", () => {
+  it("should discard saved destinations on logout", () => {
     saveAuthReturnTo("/checkout");
     beginExplicitLogout();
     saveAuthReturnTo("/orders");
     expect(consumeAuthReturnTo()).toBe("/");
   });
 
-  it("clears the logout guard when beginning another login journey", () => {
+  it("should allow new return paths after logout resets", () => {
     beginExplicitLogout();
     clearAuthReturnTo();
     saveAuthReturnTo("/orders?page=2");

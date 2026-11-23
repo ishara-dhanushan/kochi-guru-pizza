@@ -12,8 +12,8 @@ const noDelay = {
   maxJitterMs: 0
 };
 
-describe("MongoDB conflict retries", () => {
-  it("recovers after two transient conflicts", async () => {
+describe("MongoDB write-conflict retry policy", () => {
+  it("should recover after two transient write conflicts", async () => {
     let attempts = 0;
 
     const result = await withMongoConflictRetry(async () => {
@@ -32,7 +32,7 @@ describe("MongoDB conflict retries", () => {
     expect(attempts).toBe(3);
   });
 
-  it("stops at the configured attempt limit", async () => {
+  it("should stop after the configured retry limit", async () => {
     let attempts = 0;
     const conflict = Object.assign(new Error("Conflict"), {
       code: 112
@@ -51,7 +51,7 @@ describe("MongoDB conflict retries", () => {
     expect(attempts).toBe(3);
   });
 
-  it("does not retry duplicate-key errors", async () => {
+  it("should not retry duplicate-key errors", async () => {
     let attempts = 0;
     const duplicate = Object.assign(new Error("Duplicate"), {
       code: 11000
@@ -67,7 +67,7 @@ describe("MongoDB conflict retries", () => {
     expect(attempts).toBe(1);
   });
 
-  it("recognizes transient transaction error labels", () => {
+  it("should recognize transient transaction error labels", () => {
     expect(
       isRetryableMongoConflict({
         hasErrorLabel: (label: string) => label === "TransientTransactionError"
@@ -75,7 +75,7 @@ describe("MongoDB conflict retries", () => {
     ).toBe(true);
   });
 
-  it("does not retry uncertain transaction commits", () => {
+  it("should not retry uncertain transaction commits", () => {
     expect(
       isRetryableMongoConflict({
         code: 112,
@@ -85,7 +85,7 @@ describe("MongoDB conflict retries", () => {
     ).toBe(false);
   });
 
-  it("rejects invalid retry settings", async () => {
+  it("should reject invalid retry settings", async () => {
     await expect(
       withMongoConflictRetry(async () => "success", { maxAttempts: 0 })
     ).rejects.toThrow("Invalid MongoDB retry options");

@@ -1,3 +1,4 @@
+// tests/unit/cartPricing.spec.ts
 import { describe, expect, it } from "vitest";
 import {
   formatCartPrice,
@@ -9,15 +10,15 @@ import {
 } from "@lib/cartPricing";
 import { cartPasta, cartPizza, pasta, pizza, PIZZA_ID } from "../fixtures/data";
 
-describe("cart pricing", () => {
-  it("resolves prices for a selected pizza size and flat-priced pasta", () => {
+describe("Cart pricing helpers", () => {
+  it("should resolve prices for sized and flat-priced items", () => {
     expect(getCartUnitPrice(pizza, "medium")).toBe(1450.25);
     expect(getCartUnitPrice(pasta)).toBe(800.5);
     expect(getCartUnitPrice(pizza)).toBeUndefined();
     expect(getCartUnitPrice(pasta, "large")).toBeUndefined();
   });
 
-  it("rejects conflicting, missing, duplicate, and invalid prices", () => {
+  it("should reject invalid or conflicting menu prices", () => {
     expect(
       getCartUnitPrice({ ...pizza, price: 1000 }, "medium")
     ).toBeUndefined();
@@ -40,7 +41,7 @@ describe("cart pricing", () => {
     expect(getCartUnitPrice({ ...pasta, price: 1.005 })).toBeUndefined();
   });
 
-  it("uses minor units and rejects invalid quantities and overflowing totals", () => {
+  it("should validate precision, quantities and overflow", () => {
     expect(getCartLineSubtotal(0.1, 3)).toBe(0.3);
     expect(getCartLineSubtotal(1450.25, 2)).toBe(2900.5);
     expect(getCartLineSubtotal(800.5, 0)).toBeUndefined();
@@ -49,7 +50,7 @@ describe("cart pricing", () => {
     expect(getCartLineSubtotal(800.5, Number.MAX_SAFE_INTEGER)).toBeUndefined();
   });
 
-  it("uses product ID and selected size as the line identity", () => {
+  it("should key cart lines by item ID and size", () => {
     expect(getCartItemKey(cartPizza())).toBe(`${PIZZA_ID}-medium`);
     expect(getCartItemKey(cartPizza({ selectedSize: "large" }))).toBe(
       `${PIZZA_ID}-large`
@@ -58,8 +59,8 @@ describe("cart pricing", () => {
   });
 });
 
-describe("cart resolution and checkout summary", () => {
-  it("refreshes names, pricing, and subtotals from the current menu", () => {
+describe("Cart item resolution and checkout totals", () => {
+  it("should refresh cart snapshots from current menu data", () => {
     const [item] = resolveCartItems([cartPizza({ name: "Old Name" })], [pizza]);
     expect(item).toMatchObject({
       name: pizza.name,
@@ -70,7 +71,7 @@ describe("cart resolution and checkout summary", () => {
     });
   });
 
-  it("preserves deleted entries and distinguishes unavailability reasons", () => {
+  it("should distinguish deleted and unavailable items", () => {
     const items = resolveCartItems(
       [
         cartPizza(),
@@ -95,12 +96,12 @@ describe("cart resolution and checkout summary", () => {
     expect(items[2]).toMatchObject({ name: "Removed item", quantity: 2 });
   });
 
-  it("marks invalid current pricing as unavailable", () => {
+  it("should mark invalid menu prices as unavailable", () => {
     const [item] = resolveCartItems([cartPasta()], [{ ...pasta, price: -50 }]);
     expect(item.status).toBe("price_unavailable");
   });
 
-  it("excludes unselected and unavailable entries from checkout", () => {
+  it("should exclude items not eligible for checkout", () => {
     const resolved = resolveCartItems(
       [cartPizza(), cartPasta({ selected: false })],
       [pizza, pasta]
@@ -121,7 +122,7 @@ describe("cart resolution and checkout summary", () => {
     });
   });
 
-  it("does not calculate a total for missing or invalid resolved prices", () => {
+  it("should omit totals when selected prices are invalid", () => {
     const resolved = resolveCartItems([cartPizza()], [pizza]);
     expect(
       getSelectedCartSummary([{ ...resolved[0], unitPrice: undefined }])
@@ -129,7 +130,7 @@ describe("cart resolution and checkout summary", () => {
     ).toBeUndefined();
   });
 
-  it("formats currency using the existing application format", () => {
+  it("should format LKR prices consistently", () => {
     expect(formatCartPrice(0)).toContain("Rs.");
     expect(formatCartPrice(1450.25)).toContain("1,450.25");
   });

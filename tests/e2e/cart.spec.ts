@@ -29,8 +29,8 @@ async function getStoredQuantity(
   }, menuItemId);
 }
 
-test.describe("Shopping cart", () => {
-  test("adds an item, updates quantity, and preserves it after reload", async ({
+test.describe("Shopping cart browser workflows", () => {
+  test("should persist item quantities after a page reload", async ({
     page,
     menuItem
   }) => {
@@ -83,10 +83,7 @@ test.describe("Shopping cart", () => {
     await expect.poll(() => getStoredQuantity(page, menuItem.id)).toBe(2);
   });
 
-  test("redirects guests to login when proceeding to checkout", async ({
-    page,
-    menuItem
-  }) => {
+  test("should redirect guests before checkout", async ({ page, menuItem }) => {
     await page.goto("/menu");
 
     const card = page.locator("div.group").filter({

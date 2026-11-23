@@ -32,12 +32,12 @@ function makeOrder(overrides: Record<string, unknown> = {}) {
   });
 }
 
-describe("Order model", () => {
-  it("validates a correct order without connecting to MongoDB", async () => {
+describe("Order model schema and indexes", () => {
+  it("should validate a complete order without MongoDB", async () => {
     await expect(makeOrder().validate()).resolves.toBeUndefined();
   });
 
-  it("starts with pending and unpaid defaults", () => {
+  it("should default new orders to pending and unpaid", () => {
     const order = makeOrder();
     expect(order.status).toBe("pending");
     expect(order.paymentStatus).toBe("unpaid");
@@ -45,23 +45,23 @@ describe("Order model", () => {
     expect(order.deliveryFee).toBe(0);
   });
 
-  it("rejects an empty items array", async () => {
+  it("should reject orders without menu items", async () => {
     await expect(makeOrder({ items: [] }).validate()).rejects.toThrow(
       "An order must contain at least one item"
     );
   });
 
-  it("requires an address when delivering", async () => {
+  it("should require an address for delivery orders", async () => {
     await expect(
       makeOrder({ deliveryType: "delivery" }).validate()
     ).rejects.toThrow();
   });
 
-  it("rejects unsupported order status values", async () => {
+  it("should reject unsupported order statuses", async () => {
     await expect(makeOrder({ status: "unknown" }).validate()).rejects.toThrow();
   });
 
-  it("defines a unique per-user idempotency index", () => {
+  it("should define a unique customer idempotency index", () => {
     expect(Order.schema.indexes()).toEqual(
       expect.arrayContaining([
         [

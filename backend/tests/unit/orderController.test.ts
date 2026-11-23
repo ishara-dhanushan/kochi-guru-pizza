@@ -40,7 +40,7 @@ function makeHttpContext(
   return { req, res };
 }
 
-describe("OrderController", () => {
+describe("OrderController HTTP response handling", () => {
   beforeEach(() => {
     jest.mocked(orderService.createOrder).mockReset();
     jest.mocked(orderService.listOrders).mockReset();
@@ -55,7 +55,7 @@ describe("OrderController", () => {
     } as never);
   });
 
-  it("responds 201 when a customer creates a new order", async () => {
+  it("should return 201 when checkout creates an order", async () => {
     jest.mocked(orderService.createOrder).mockResolvedValue({
       created: true,
       order: {} as never
@@ -71,7 +71,7 @@ describe("OrderController", () => {
     );
   });
 
-  it("responds 200 for a replayed order", async () => {
+  it("should return 200 when a previous order is replayed", async () => {
     jest.mocked(orderService.createOrder).mockResolvedValue({
       created: false,
       order: {} as never
@@ -86,7 +86,7 @@ describe("OrderController", () => {
     );
   });
 
-  it("lists only the authenticated customer's orders", async () => {
+  it("should scope customer history to the current user", async () => {
     const result = {
       orders: [],
       pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
@@ -103,7 +103,7 @@ describe("OrderController", () => {
     expect(res.json).toHaveBeenCalledWith(result);
   });
 
-  it("lists all orders for the administrator route", async () => {
+  it("should list all orders on the staff-only endpoint", async () => {
     const result = {
       orders: [],
       pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
@@ -120,7 +120,7 @@ describe("OrderController", () => {
     expect(res.json).toHaveBeenCalledWith(result);
   });
 
-  it("returns structured errors from order service", async () => {
+  it("should preserve service error codes and statuses", async () => {
     jest
       .mocked(orderService.createOrder)
       .mockRejectedValue(

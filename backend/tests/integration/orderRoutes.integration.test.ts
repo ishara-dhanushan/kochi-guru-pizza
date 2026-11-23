@@ -40,7 +40,7 @@ jest.mock("@services/r2Service", () => ({
  * Real HTTP requests, JWT verification and MongoDB persistence.
  * No Google OAuth or Cloudflare R2 provider requests are permitted.
  */
-describe("Order routes — MongoDB integration", () => {
+describe("Order API with real MongoDB", () => {
   const getFixtures = useOrderFixtures();
 
   function makePayload(overrides: Record<string, unknown> = {}) {
@@ -74,7 +74,7 @@ describe("Order routes — MongoDB integration", () => {
   }
 
   describe("POST /v1/orders", () => {
-    it("creates an order using server-side prices", async () => {
+    it("should return 201 with server-calculated prices", async () => {
       const response = await sendCreateOrder(getFixtures().customerToken);
 
       expect(response.status).toBe(201);
@@ -88,7 +88,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(savedOrder?.items[0].nameSnapshot).toBe("Chicken Pizza");
     });
 
-    it("rejects requests without authentication", async () => {
+    it("should return 401 for unauthenticated checkout", async () => {
       const response = await request(app)
         .post("/v1/orders")
         .send(makePayload());
@@ -96,7 +96,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.status).toBe(401);
     });
 
-    it("rejects manipulated totals", async () => {
+    it("should return 400 for client-supplied totals", async () => {
       const response = await sendCreateOrder(
         getFixtures().customerToken,
         makePayload({ total: 1 })
@@ -105,7 +105,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.status).toBe(400);
     });
 
-    it("replays the original order for the same idempotency key", async () => {
+    it("should replay an order for a matching request key", async () => {
       const payload = makePayload();
       const first = await sendCreateOrder(getFixtures().customerToken, payload);
       const second = await sendCreateOrder(
@@ -119,7 +119,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(second.body.order._id).toBe(first.body.order._id);
     });
 
-    it("rejects changed order data with the same idempotency key", async () => {
+    it("should return 409 for conflicting checkout retries", async () => {
       const payload = makePayload();
       const first = await sendCreateOrder(getFixtures().customerToken, payload);
       const changed = await sendCreateOrder(getFixtures().customerToken, {
@@ -141,7 +141,7 @@ describe("Order routes — MongoDB integration", () => {
       ).toBe(1);
     });
 
-    it("prevents duplicate orders from concurrent requests", async () => {
+    it("should create one order for concurrent retries", async () => {
       const payload = makePayload();
       const [first, second] = await Promise.all([
         sendCreateOrder(getFixtures().customerToken, payload),
@@ -157,7 +157,7 @@ describe("Order routes — MongoDB integration", () => {
       ).toBe(1);
     });
 
-    it("rejects unavailable products", async () => {
+    it("should return 409 when a product is unavailable", async () => {
       await MenuItem.findByIdAndUpdate(getFixtures().pizzaId, {
         isAvailable: false
       });
@@ -168,7 +168,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.body.code).toBe("ITEM_UNAVAILABLE");
     });
 
-    it("uses the latest database price", async () => {
+    it("should use the latest stored menu price", async () => {
       await MenuItem.findByIdAndUpdate(getFixtures().pizzaId, {
         variants: [
           { size: "small", price: 1500 },
@@ -182,7 +182,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.body.order.total).toBe(7000);
     });
 
-    it("disables online payment until PayHere is integrated", async () => {
+    it("should reject online payment before integration", async () => {
       const response = await sendCreateOrder(
         getFixtures().customerToken,
         makePayload({ paymentMethod: "online" })
@@ -193,8 +193,8 @@ describe("Order routes — MongoDB integration", () => {
     });
   });
 
-  describe("GET /v1/orders/me and GET /v1/orders", () => {
-    it("returns only the customer's own orders", async () => {
+  describe("GET /v1/orders/me", () => {
+    it("should return only the signed-in customer's orders", async () => {
       const ownOrderId = await createCustomerOrder();
       const other = await sendCreateOrder(getFixtures().otherCustomerToken);
       expect(other.status).toBe(201);
@@ -209,8 +209,10 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.body.orders[0]._id).not.toBe(other.body.order._id);
       expect(response.body.pagination.total).toBe(1);
     });
+  });
 
-    it("forbids customers from administrative order listing", async () => {
+  describe("GET /v1/orders", () => {
+    it("should return 403 for customer order listing access", async () => {
       const response = await request(app)
         .get("/v1/orders")
         .set("Authorization", `Bearer ${getFixtures().customerToken}`);
@@ -218,7 +220,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.status).toBe(403);
     });
 
-    it("allows administrators to retrieve the order list", async () => {
+    it("should permit administrators to list orders", async () => {
       const response = await request(app)
         .get("/v1/orders?status=pending")
         .set("Authorization", `Bearer ${getFixtures().adminToken}`);
@@ -231,7 +233,7 @@ describe("Order routes — MongoDB integration", () => {
       // the same test database.
     });
 
-    it("allows staff to retrieve the order list", async () => {
+    it("should permit staff to list orders", async () => {
       const response = await request(app)
         .get("/v1/orders?status=pending")
         .set("Authorization", `Bearer ${getFixtures().staffToken}`);
@@ -241,7 +243,7 @@ describe("Order routes — MongoDB integration", () => {
   });
 
   describe("PATCH /v1/orders/:id/status", () => {
-    it("allows administrators to confirm an order", async () => {
+    it("should allow administrators to confirm pending orders", async () => {
       const orderId = await createCustomerOrder();
       const response = await request(app)
         .patch(`/v1/orders/${orderId}/status`)
@@ -252,7 +254,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.body.order.status).toBe("confirmed");
     });
 
-    it("forbids customer status updates", async () => {
+    it("should return 403 for customer status updates", async () => {
       const orderId = await createCustomerOrder();
       const response = await request(app)
         .patch(`/v1/orders/${orderId}/status`)
@@ -262,7 +264,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.status).toBe(403);
     });
 
-    it("rejects invalid status transitions", async () => {
+    it("should reject invalid status transitions", async () => {
       const orderId = await createCustomerOrder();
       const response = await request(app)
         .patch(`/v1/orders/${orderId}/status`)
@@ -273,7 +275,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.body.code).toBe("INVALID_STATUS_TRANSITION");
     });
 
-    it("allows staff to confirm an order", async () => {
+    it("should allow staff to confirm pending orders", async () => {
       const orderId = await createCustomerOrder();
       const response = await request(app)
         .patch(`/v1/orders/${orderId}/status`)
@@ -283,7 +285,7 @@ describe("Order routes — MongoDB integration", () => {
       expect(response.status).toBe(200);
     });
 
-    it("treats repeated status updates as idempotent", async () => {
+    it("should preserve status for repeated updates", async () => {
       const orderId = await createCustomerOrder();
       for (let attempt = 0; attempt < 2; attempt++) {
         const response = await request(app)

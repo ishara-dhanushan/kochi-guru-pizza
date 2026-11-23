@@ -1,8 +1,8 @@
 // e2e/menu.spec.ts
 import { test, expect } from "../fixtures/menu";
 
-test.describe("Menu browsing", () => {
-  test("displays menu items and filters search results", async ({
+test.describe("Menu browsing browser workflows", () => {
+  test("should filter seeded menu items through search", async ({
     page,
     menuItem
   }) => {
@@ -32,7 +32,7 @@ test.describe("Menu browsing", () => {
     await expect(heading).toBeVisible();
   });
 
-  test("updates the price when changing the pizza size", async ({
+  test("should update visible prices when pizza sizes change", async ({
     page,
     menuItem
   }) => {

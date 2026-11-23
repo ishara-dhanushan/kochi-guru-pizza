@@ -1,3 +1,4 @@
+// tests/integration/CheckoutContent.spec.tsx
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
@@ -109,8 +110,8 @@ beforeEach(() => {
   });
 });
 
-describe("checkout: real cart + menu + order service integration", () => {
-  it("redirects signed-out customers without creating an order", async () => {
+describe("CheckoutContent order submission and recovery", () => {
+  it("should redirect guests before creating orders", async () => {
     mocks.user = null;
     renderCheckout();
 
@@ -119,7 +120,7 @@ describe("checkout: real cart + menu + order service integration", () => {
     expect(orderCalls()).toHaveLength(0);
   });
 
-  it("sends only selected item identifiers and removes quantities on success", async () => {
+  it("should submit selected items and clear purchased units", async () => {
     renderCheckout();
     await submitOrder();
 
@@ -152,7 +153,7 @@ describe("checkout: real cart + menu + order service integration", () => {
     });
   });
 
-  it("reuses the identical payload and idempotency key on uncertain failure", async () => {
+  it("should reuse pending payloads after uncertain errors", async () => {
     let attempts = 0;
     orderHandler = async () => {
       attempts += 1;
@@ -184,7 +185,7 @@ describe("checkout: real cart + menu + order service integration", () => {
     expect(window.sessionStorage.getItem(ATTEMPT_KEY)).toBeNull();
   });
 
-  it("clears a definitive 409 attempt and requests new menu data", async () => {
+  it("should refresh prices after definitive conflicts", async () => {
     orderHandler = async () => {
       throw new ApiError("Menu changed", 409);
     };
@@ -202,7 +203,7 @@ describe("checkout: real cart + menu + order service integration", () => {
     expect(orderCalls()).toHaveLength(1);
   });
 
-  it("does not create orders when the selected size no longer has a price", async () => {
+  it("should block checkout when size prices disappear", async () => {
     mocks.menuItems = [{ ...pizza, variants: [] }, pasta];
     renderCheckout();
 
@@ -215,7 +216,7 @@ describe("checkout: real cart + menu + order service integration", () => {
     expect(storedCart()).toHaveLength(2);
   });
 
-  it("does not process a pending attempt belonging to another account", async () => {
+  it("should prevent replaying another user's checkout", async () => {
     window.sessionStorage.setItem(
       ATTEMPT_KEY,
       JSON.stringify({

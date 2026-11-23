@@ -64,7 +64,7 @@ function storedOrder(overrides: Record<string, unknown> = {}): IOrder {
   } as unknown as IOrder;
 }
 
-describe("OrderService", () => {
+describe("OrderService business rules", () => {
   beforeEach(() => {
     // Avoid live MongoDB calls in unit tests. These spies are restored by Jest.
     jest.spyOn(Order, "createIndexes").mockResolvedValue([] as never);
@@ -103,7 +103,7 @@ describe("OrderService", () => {
   });
 
   describe("getRequestHash", () => {
-    it("ignores cart item ordering", () => {
+    it("should hash reordered cart items identically", () => {
       const input: CreateOrderInput = {
         ...orderInput,
         items: [{ menuItemId: userId, qty: 1 }, ...orderInput.items]
@@ -114,7 +114,7 @@ describe("OrderService", () => {
       );
     });
 
-    it("changes when checkout quantities change", () => {
+    it("should change the hash when quantities change", () => {
       expect(getRequestHash(orderInput)).not.toBe(
         getRequestHash({
           ...orderInput,
@@ -125,7 +125,7 @@ describe("OrderService", () => {
   });
 
   describe("toOrderResponse", () => {
-    it("removes the internal idempotency key and request hash", () => {
+    it("should omit internal idempotency fields", () => {
       const result = toOrderResponse(storedOrder());
 
       expect(result.total).toBe(1400);
@@ -136,7 +136,7 @@ describe("OrderService", () => {
   });
 
   describe("createOrder", () => {
-    it("creates a snapshot using authoritative pricing", async () => {
+    it("should persist an authoritative price snapshot", async () => {
       const result = await createOrder(userId, orderInput);
 
       expect(result.created).toBe(true);
@@ -149,7 +149,7 @@ describe("OrderService", () => {
       );
     });
 
-    it("returns an existing order for an identical retry", async () => {
+    it("should replay the same order for identical retries", async () => {
       const existing = storedOrder();
       jest
         .spyOn(Order, "findOne")
@@ -164,7 +164,7 @@ describe("OrderService", () => {
       expect(getOrderPricing).not.toHaveBeenCalled();
     });
 
-    it("rejects changed contents for an existing key", async () => {
+    it("should reject reused keys with changed content", async () => {
       const existing = storedOrder({ requestHash: "different-hash" });
       jest
         .spyOn(Order, "findOne")
@@ -179,7 +179,7 @@ describe("OrderService", () => {
       expect(Order.create).not.toHaveBeenCalled();
     });
 
-    it("rejects online payments before verification is available", async () => {
+    it("should reject unavailable online payments", async () => {
       await expect(
         createOrder(userId, { ...orderInput, paymentMethod: "online" })
       ).rejects.toMatchObject({
@@ -191,7 +191,7 @@ describe("OrderService", () => {
   });
 
   describe("updateOrderStatus", () => {
-    it("moves pending orders to confirmed", async () => {
+    it("should confirm a pending order", async () => {
       const result = await updateOrderStatus(userId, "confirmed");
 
       expect(result.status).toBe("confirmed");
@@ -202,7 +202,7 @@ describe("OrderService", () => {
       );
     });
 
-    it("rejects an invalid transition without writing", async () => {
+    it("should reject invalid transitions without writing", async () => {
       await expect(
         updateOrderStatus(userId, "delivered")
       ).rejects.toMatchObject({
@@ -212,7 +212,7 @@ describe("OrderService", () => {
       expect(Order.findOneAndUpdate).not.toHaveBeenCalled();
     });
 
-    it("rejects a concurrent state change", async () => {
+    it("should reject concurrent order state changes", async () => {
       jest.spyOn(Order, "findOneAndUpdate").mockResolvedValue(null as never);
 
       await expect(
@@ -223,7 +223,7 @@ describe("OrderService", () => {
       });
     });
 
-    it("does not process unverified online payments", async () => {
+    it("should block unverified online orders", async () => {
       jest.spyOn(Order, "findById").mockResolvedValue(
         storedOrder({
           paymentMethod: "online",

@@ -1,3 +1,4 @@
+// tests/integration/CartContent.spec.tsx
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -50,8 +51,8 @@ function renderCart(items = [cartPizza(), cartPasta({ selected: false })]) {
   );
 }
 
-describe("shopping cart: provider + hook + API + UI", () => {
-  it("loads current prices and totals only the selected product", async () => {
+describe("CartContent with real cart state and menu hooks", () => {
+  it("should total only selected items at current prices", async () => {
     renderCart();
 
     await waitFor(() => {
@@ -71,7 +72,7 @@ describe("shopping cart: provider + hook + API + UI", () => {
     ).not.toBeChecked();
   });
 
-  it("keeps unavailable products in storage but blocks their selection", async () => {
+  it("should retain unavailable items but disable selection", async () => {
     mocks.request.mockResolvedValue({
       items: [pizza, { ...pasta, isAvailable: false }]
     });
@@ -92,7 +93,7 @@ describe("shopping cart: provider + hook + API + UI", () => {
     ).toBeEnabled();
   });
 
-  it("persists quantity changes and prevents checkout after deselection", async () => {
+  it("should disable checkout after deselecting all items", async () => {
     const user = userEvent.setup();
     renderCart([cartPizza()]);
 
@@ -119,7 +120,7 @@ describe("shopping cart: provider + hook + API + UI", () => {
     ).toBeDisabled();
   });
 
-  it("navigates only after the menu response validates the selected cart", async () => {
+  it("should open checkout only after menu validation", async () => {
     const user = userEvent.setup();
     renderCart([cartPizza()]);
 
@@ -132,7 +133,7 @@ describe("shopping cart: provider + hook + API + UI", () => {
     expect(mocks.push).toHaveBeenCalledWith("/checkout");
   });
 
-  it("preserves the cart during an API outage and recovers when retried", async () => {
+  it("should preserve the cart and recover after API errors", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     mocks.request
       .mockRejectedValueOnce(new Error("Offline"))

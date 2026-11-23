@@ -1,3 +1,4 @@
+// tests/unit/orderService.spec.ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { orderService } from "@services/orderService";
 import { PIZZA_ID } from "../fixtures/data";
@@ -12,8 +13,8 @@ beforeEach(() => {
   mocks.request.mockReset();
 });
 
-describe("order service", () => {
-  it("sends only the order request fields and preserves its idempotency key", async () => {
+describe("OrderService HTTP request contract", () => {
+  it("should submit only permitted checkout fields", async () => {
     const payload = {
       items: [
         { menuItemId: PIZZA_ID, selectedSize: "medium" as const, qty: 2 }
@@ -44,7 +45,7 @@ describe("order service", () => {
     );
   });
 
-  it("uses default pagination when requesting a customer's order history", async () => {
+  it("should apply default order history pagination", async () => {
     mocks.request.mockResolvedValue({ orders: [], pagination: {} });
     await orderService.getMyOrders();
     expect(mocks.request).toHaveBeenCalledWith("/orders/me?page=1&limit=10", {
@@ -52,7 +53,7 @@ describe("order service", () => {
     });
   });
 
-  it("adds status and pagination filters without dropping no-store caching", async () => {
+  it("should retain no-store caching with filters", async () => {
     mocks.request.mockResolvedValue({ orders: [], pagination: {} });
     await orderService.getMyOrders({ page: 3, limit: 5, status: "confirmed" });
     expect(mocks.request).toHaveBeenCalledWith(
@@ -61,7 +62,7 @@ describe("order service", () => {
     );
   });
 
-  it("propagates backend failures to the caller", async () => {
+  it("should propagate backend request failures", async () => {
     mocks.request.mockRejectedValue(new Error("Request failed"));
     await expect(orderService.getMyOrders()).rejects.toThrow("Request failed");
   });

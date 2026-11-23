@@ -1,3 +1,4 @@
+// tests/unit/menuService.spec.ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { menuService } from "@services/menuService";
 import { pasta, pizza } from "../fixtures/data";
@@ -10,14 +11,14 @@ beforeEach(() => {
   mocks.request.mockReset();
 });
 
-describe("menu retrieval used by cart and checkout", () => {
-  it("retrieves the complete current menu without cached results", async () => {
+describe("MenuService current-menu retrieval", () => {
+  it("should fetch fresh menu items without caching", async () => {
     mocks.request.mockResolvedValue({ items: [pizza, pasta] });
     await expect(menuService.getMenuItems()).resolves.toEqual([pizza, pasta]);
     expect(mocks.request).toHaveBeenCalledWith("/menu", { cache: "no-store" });
   });
 
-  it("passes category and availability parameters to the API", async () => {
+  it("should pass category and availability query filters", async () => {
     mocks.request.mockResolvedValue({ items: [pizza] });
     await menuService.getMenuItems({ category: "pizza", isAvailable: false });
     expect(mocks.request).toHaveBeenCalledWith(
@@ -26,7 +27,7 @@ describe("menu retrieval used by cart and checkout", () => {
     );
   });
 
-  it("rejects missing or malformed menu lists rather than showing an empty menu", async () => {
+  it("should reject malformed menu responses", async () => {
     for (const response of [
       {},
       { items: null },
@@ -39,7 +40,7 @@ describe("menu retrieval used by cart and checkout", () => {
     }
   });
 
-  it("rejects duplicate IDs even when letter casing differs", async () => {
+  it("should reject duplicate IDs regardless of casing", async () => {
     mocks.request.mockResolvedValue({
       items: [pizza, { ...pizza, _id: pizza._id.toUpperCase() }]
     });

@@ -15,15 +15,15 @@ const validBody = {
   idempotencyKey: "123e4567-e89b-42d3-a456-426614174000"
 };
 
-describe("Order request validation", () => {
+describe("Order request validation schemas", () => {
   describe("createOrderSchema", () => {
-    it("accepts valid checkout input", () => {
+    it("should accept valid checkout details", () => {
       expect(createOrderSchema.safeParse({ body: validBody }).success).toBe(
         true
       );
     });
 
-    it("rejects client-supplied totals", () => {
+    it("should reject client-supplied totals", () => {
       expect(
         createOrderSchema.safeParse({
           body: { ...validBody, total: 1 }
@@ -31,7 +31,7 @@ describe("Order request validation", () => {
       ).toBe(false);
     });
 
-    it("rejects client-supplied unit prices", () => {
+    it("should reject client-supplied item prices", () => {
       expect(
         createOrderSchema.safeParse({
           body: {
@@ -42,7 +42,7 @@ describe("Order request validation", () => {
       ).toBe(false);
     });
 
-    it("requires an address for delivery", () => {
+    it("should require an address for delivery", () => {
       expect(
         createOrderSchema.safeParse({
           body: { ...validBody, deliveryType: "delivery" }
@@ -50,7 +50,7 @@ describe("Order request validation", () => {
       ).toBe(false);
     });
 
-    it("rejects duplicate menu item and size combinations", () => {
+    it("should reject duplicate item and size pairs", () => {
       expect(
         createOrderSchema.safeParse({
           body: {
@@ -61,7 +61,7 @@ describe("Order request validation", () => {
       ).toBe(false);
     });
 
-    it("rejects invalid quantities", () => {
+    it("should reject zero item quantities", () => {
       expect(
         createOrderSchema.safeParse({
           body: {
@@ -74,11 +74,11 @@ describe("Order request validation", () => {
   });
 
   describe("listOrdersQuerySchema", () => {
-    it("applies pagination defaults", () => {
+    it("should apply default pagination", () => {
       expect(listOrdersQuerySchema.parse({})).toEqual({ page: 1, limit: 20 });
     });
 
-    it("rejects invalid pages", () => {
+    it("should reject page zero", () => {
       expect(listOrdersQuerySchema.safeParse({ page: "0" }).success).toBe(
         false
       );
@@ -86,7 +86,7 @@ describe("Order request validation", () => {
   });
 
   describe("updateOrderStatusSchema", () => {
-    it("rejects unsupported statuses", () => {
+    it("should reject unsupported status values", () => {
       expect(
         updateOrderStatusSchema.safeParse({
           params: { id: menuItemId },
