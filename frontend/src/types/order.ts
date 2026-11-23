@@ -85,3 +85,10 @@ export interface MyOrdersQuery {
   limit?: number;
   status?: OrderStatus;
 }
+
+// Operational order endpoints share the personal history response shape.
+export type ListAllOrdersResponse = ListMyOrdersResponse;
+
+export interface UpdateOrderStatusResponse {
+  order: OrderRecord;
+}

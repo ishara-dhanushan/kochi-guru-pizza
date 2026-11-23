@@ -1,5 +1,6 @@
 // tests/unit/orderService.spec.ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ApiError } from "@lib/ApiError";
 import { orderService } from "@services/orderService";
 import { PIZZA_ID } from "../fixtures/data";
 
@@ -61,6 +62,54 @@ describe("OrderService HTTP request contract", () => {
       { cache: "no-store" }
     );
   });
+
+  it("should list operational orders using pagination and status filters", async () => {
+    mocks.request.mockResolvedValue({ orders: [], pagination: {} });
+    await orderService.getAllOrders({ page: 2, limit: 5, status: "pending" });
+
+    expect(mocks.request).toHaveBeenCalledWith(
+      "/orders?page=2&limit=5&status=pending",
+      { cache: "no-store" }
+    );
+  });
+
+  it("should use default pagination for the operational order list", async () => {
+    mocks.request.mockResolvedValue({ orders: [], pagination: {} });
+    await orderService.getAllOrders();
+
+    expect(mocks.request).toHaveBeenCalledWith("/orders?page=1&limit=10", {
+      cache: "no-store"
+    });
+  });
+
+  it("should send only the requested next status to the update endpoint", async () => {
+    mocks.request.mockResolvedValue({ order: { status: "confirmed" } });
+    const id = "dddddddddddddddddddddddd";
+
+    await orderService.updateOrderStatus(id, "confirmed");
+
+    expect(mocks.request).toHaveBeenCalledWith(`/orders/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: "confirmed" }),
+      cache: "no-store"
+    });
+  });
+
+  it.each([
+    ["INVALID_STATUS_TRANSITION", "Cannot change order status"],
+    ["ORDER_STATE_CHANGED", "The order has changed"]
+  ] as const)(
+    "should preserve %s errors when the backend rejects a status change",
+    async (code, message) => {
+      mocks.request.mockRejectedValue(
+        new ApiError(message, 409, undefined, code)
+      );
+
+      await expect(
+        orderService.updateOrderStatus("dddddddddddddddddddddddd", "ready")
+      ).rejects.toMatchObject({ status: 409, code, message });
+    }
+  );
 
   it("should propagate backend request failures", async () => {
     mocks.request.mockRejectedValue(new Error("Request failed"));
